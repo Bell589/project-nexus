@@ -1,7 +1,7 @@
 # Project Nexus — Grundgerüst
 
 Das Projekt ist ein Textbasiertes RPG Brwosegame. Es ist mein Erster Versuch und befindet sich aktuell noch im Aufbau. 
-Zum Starten im Terminal einmal im ordner Backend "npm run dev" der dann im port http://localhost:3001 ausgeführt wird und im ordner Frontend "npm run dev" ebenfalls ausführen der läuft dann im browser unter http://localhost:5173 wo er auch zu öffnen ist, geht aber direkt in der IDE im Terminal Auf den link "http://localhost:5173" mit STRG und links klick öffnen.
+Zum Starten im Terminal einmal im ordner Backend "npm run dev" der dann im port http://localhost:3001 ausgeführt wird und im ordner Frontend "npm run dev" ebenfalls ausführen der läuft dann im browser unter http://localhost:5173 wo er auch zu öffnen ist, geht aber direkt in der IDE im Terminal Auf den link "http://localhost:5173" mit STRG und links klick öffnen. Bisher läuft das alles aber nur Local.
 
 Monorepo (npm workspaces): `backend` (Express + TypeScript, In-Memory-Store) und
 `frontend` (React + Vite + TypeScript).
