@@ -1,0 +1,110 @@
+import type { Faction } from "../types/faction.js";
+
+export const FACTIONS: Faction[] = [
+  // --- Ozeanwelt: identisches Kampfsystem für beide Fraktionen ---
+  {
+    id: "piraten",
+    worldId: "ozeanwelt",
+    name: "Piraten",
+    description: "Freie Crews ohne NPCs. Gründer wird Captain, Crew organisiert sich selbst.",
+    playerAssignedRanks: ["Captain", "Erster Offizier", "Kommandant"],
+    baseSkills: ["Wille", "Waffenkampf", "Seefahrt", "Schiffssystem"],
+    corePowerLabel: "Relikt",
+    corePowerStages: [
+      "Relikt",
+      "Synchronisation",
+      "Resonanz",
+      "Erwachen",
+      "Mythische Manifestation",
+      "Unbegrenzte Weiterentwicklung",
+    ],
+  },
+  {
+    id: "marine",
+    worldId: "ozeanwelt",
+    name: "Marine",
+    description: "Weltregierung (anfangs Administrator-geführt) mit Fünf Weisen, Marine, CP.",
+    playerAssignedRanks: ["Admiral", "Flottenadmiral", "Oberkommandant"],
+    baseSkills: ["Wille", "Waffenkampf", "Seefahrt", "Schiffssystem"],
+    corePowerLabel: "Relikt",
+    corePowerStages: [
+      "Relikt",
+      "Synchronisation",
+      "Resonanz",
+      "Erwachen",
+      "Mythische Manifestation",
+      "Unbegrenzte Weiterentwicklung",
+    ],
+  },
+
+  // --- Soul Society: jede Fraktion eigener Kernmacht-Pfad ---
+  {
+    id: "shinigami",
+    worldId: "soul_society",
+    name: "Shinigami",
+    description: "Kämpfen mit Schwertkampf, Kido, Hohō. Erschaffen ab bestimmter Kampfkraft eine Seelenwaffe.",
+    playerAssignedRanks: ["Divisionsleiter", "Kommandant", "Vize"],
+    baseSkills: ["Schwertkampf", "Kido", "Hohō"],
+    corePowerLabel: "Seelenwaffe",
+    corePowerStages: [
+      "Versiegelt",
+      "Erweckt",
+      "Resonanz",
+      "Domäne",
+      "Absolute Manifestation",
+      "Unbegrenzte Weiterentwicklung",
+    ],
+  },
+  {
+    id: "hollow",
+    worldId: "soul_society",
+    name: "Hollow",
+    description: "Evolution von Hollow über Gillian, Adjuchas bis Vasto Lorde. Ab Adjuchas: Resurrección.",
+    playerAssignedRanks: ["Espada", "Fracción", "Kommandant"],
+    baseSkills: ["Cero", "Hierro", "Sonído"],
+    corePowerLabel: "Resurrección",
+    corePowerStages: [
+      "Hollow",
+      "Gillian",
+      "Adjuchas",
+      "Vasto Lorde",
+      "Resurrección: Einzigartige Form",
+      "Optionale zweite Form",
+      "Unbegrenzte Weiterentwicklung",
+    ],
+  },
+  {
+    id: "quincy",
+    worldId: "soul_society",
+    name: "Quincy",
+    description: "Reishi-Kontrolle, Hirenkyaku, spirituelle Waffen. Entwicklung zu Complete.",
+    playerAssignedRanks: ["Großmeister", "Ritter", "Kommandant"],
+    baseSkills: ["Reishi-Kontrolle", "Hirenkyaku", "Spirituelle Waffen"],
+    corePowerLabel: "Complete",
+    corePowerStages: [
+      "Einzigartige Waffe",
+      "Complete",
+      "Neue Fähigkeiten",
+      "Neue Formen",
+      "Unbegrenzte Weiterentwicklung",
+    ],
+  },
+
+  // --- Avalon: eine Fraktion, Kernmacht = einzigartige Magie ---
+  {
+    id: "magier",
+    worldId: "avalon",
+    name: "Magier",
+    description: "Bewahren Magie, Portale, Ley-Linien, Spektralwelt. Kämpfen um das Arkane Netzwerk.",
+    playerAssignedRanks: ["Magierführer", "Leiter eines Ordens", "Großmeister"],
+    baseSkills: ["Mana-Kontrolle", "Waffenkampf", "Magische Verstärkung", "Beschwörungsgrundlagen", "Runen", "Barrieren"],
+    corePowerLabel: "Einzigartige Magie",
+    corePowerStages: [
+      "Grundfähigkeiten (Ort der Macht gefunden)",
+      "Vertiefte Technik",
+      "Erweiterte Technik",
+      "Meisterschaft",
+      "Unbegrenzte Weiterentwicklung",
+    ],
+  },
+];
