@@ -6,6 +6,8 @@ import {
   listCharacters,
   ValidationError,
 } from "../services/characterService.js";
+import { acquireCorePower, advanceCorePowerStage } from "../services/corePowerService.js";
+import { trainComponent } from "../services/trainingService.js";
 
 export const charactersRouter = Router();
 
@@ -38,3 +40,45 @@ charactersRouter.get("/:id", (req, res) => {
     throw err;
   }
 });
+
+charactersRouter.post("/:id/train", (req, res) => {
+  try {
+    const { component, amount } = req.body;
+    const character = trainComponent(req.params.id, component, amount);
+    res.json({ ...character, kampfkraft: getKampfkraft(character) });
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    throw err;
+  }
+});
+
+charactersRouter.post("/:id/core-power/acquire", (req, res) => {
+  try {
+    const { archetype, name } = req.body;
+    const character = acquireCorePower({ characterId: req.params.id, archetype, name });
+    res.json({ ...character, kampfkraft: getKampfkraft(character) });
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    throw err;
+  }
+});
+
+charactersRouter.post("/:id/core-power/advance", (req, res) => {
+  try {
+    const character = advanceCorePowerStage(req.params.id);
+    res.json({ ...character, kampfkraft: getKampfkraft(character) });
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    throw err;
+  }
+});
+

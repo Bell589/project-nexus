@@ -1,8 +1,5 @@
 # Project Nexus — Grundgerüst
 
-Das Projekt ist ein Textbasiertes RPG Brwosegame. Es ist mein Erster Versuch und befindet sich aktuell noch im Aufbau. 
-Zum Starten im Terminal einmal im ordner Backend "npm run dev" der dann im port http://localhost:3001 ausgeführt wird und im ordner Frontend "npm run dev" ebenfalls ausführen der läuft dann im browser unter http://localhost:5173 wo er auch zu öffnen ist, geht aber direkt in der IDE im Terminal Auf den link "http://localhost:5173" mit STRG und links klick öffnen.
-
 Monorepo (npm workspaces): `backend` (Express + TypeScript, In-Memory-Store) und
 `frontend` (React + Vite + TypeScript).
 
@@ -37,18 +34,40 @@ project-nexus/
   Dokument übernommen.
 - **Kampfkraft-System**: aggregiert aus Erfahrung, Ausrüstung, Fähigkeiten,
   Systembeherrschung, Erfolgen, Training — gewichtet, keine feste Obergrenze.
+  Im Frontend trainierbar (+10 pro Klick und Komponente).
+- **Kernmacht-Erwerb & Entwicklung**: Charakter startet ohne Kernmacht, muss
+  erst genug Kampfkraft sammeln (Schwelle 20), dann eigenen Archetyp + Namen
+  vergeben (z.B. "Relikt des Blitzes" → "Donner des Himmels"). Danach
+  Stufenaufstieg gegen steigende Kampfkraft-Schwellen
+  (`backend/src/types/corePowerThresholds.ts`), bis "Unbegrenzte
+  Weiterentwicklung" erreicht ist.
+- **Crew-System** (Ozeanwelt): Charakter gründet Crew (wird Captain) oder
+  tritt bestehender Crew der eigenen Fraktion bei. Captain vergibt Rollen
+  (Offizier, Kommandant, Stellvertreter, Mitglied) — komplett spielergeführt,
+  keine System-Level.
+- **Flotten-System** (Ozeanwelt): Crew-Captains können mehrere Crews zu einer
+  Flotte zusammenschließen (Backend-Endpunkte fertig, noch ohne Frontend-UI).
 - **Charaktererstellung**: Welt wählen → Fraktion wählen → Charakter anlegen.
 - **API**: `GET /api/worlds`, `GET /api/worlds/:id/factions`,
-  `POST /api/characters`, `GET /api/characters/:id`.
+  `POST /api/characters`, `GET /api/characters/:id`,
+  `POST /api/characters/:id/train`,
+  `POST /api/characters/:id/core-power/acquire`,
+  `POST /api/characters/:id/core-power/advance`,
+  `GET /api/crews`, `POST /api/crews`, `GET /api/crews/:id`,
+  `POST /api/crews/:id/join`, `POST /api/crews/:id/roles`,
+  `GET /api/fleets`, `POST /api/fleets`, `POST /api/fleets/:id/join`.
 
 ## Was bewusst noch fehlt (nächste Schritte)
 
 - Persistente Datenbank (aktuell In-Memory, Daten weg bei Neustart)
 - Authentifizierung / Spieler-Accounts
-- Crew-/Flotten-System, Seelenbezirke, Arkanes Netzwerk (Territorien-Logik)
-- Kernmacht-Erwerb (Relikt finden, Seelenwaffen-Prüfung, Ort der Macht) als
-  eigener Spielablauf statt direkt bei Charaktererstellung
+- Flotten-Frontend-UI (Backend fertig)
+- Seelenbezirke (Soul Society), Arkanes Netzwerk (Avalon), Territorien
+  (Ozeanwelt) als eigene Systeme
+- Hollow-Evolution (Gillian→Adjuchas→Vasto Lorde) als eigener Ablauf statt
+  generischer Stufenaufstieg
 - Fusion-System (Avalon)
+- Domänen-System (Soul Society)
 
 ## Installation & Start
 

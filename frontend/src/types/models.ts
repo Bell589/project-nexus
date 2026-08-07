@@ -34,6 +34,32 @@ export interface Character {
   };
   corePower: { name: string; archetype: string; stageIndex: number; unlockedAbilities: string[] } | null;
   selfAssignedRank: string | null;
+  crewId: string | null;
   createdAt: string;
   kampfkraft?: number;
+}
+
+export type CrewRole = "Captain" | "Offizier" | "Kommandant" | "Stellvertreter" | "Mitglied";
+
+export interface CrewMember {
+  characterId: string;
+  role: CrewRole;
+}
+
+export interface Crew {
+  id: string;
+  name: string;
+  worldId: "ozeanwelt";
+  factionId: "piraten" | "marine";
+  members: CrewMember[];
+  fleetId: string | null;
+  createdAt: string;
+}
+
+export interface Fleet {
+  id: string;
+  name: string;
+  worldId: "ozeanwelt";
+  memberCrewIds: string[];
+  createdAt: string;
 }

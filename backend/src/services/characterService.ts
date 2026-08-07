@@ -46,6 +46,7 @@ export function createCharacter(input: CreateCharacterInput): Character {
     },
     corePower: null, // wird erst freigeschaltet, sobald genug Kampfkraft erreicht ist
     selfAssignedRank: null,
+    crewId: null,
     createdAt: new Date().toISOString(),
   };
 

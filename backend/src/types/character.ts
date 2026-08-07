@@ -22,5 +22,6 @@ export interface Character {
   kampfkraftComponents: KampfkraftComponents;
   corePower: CorePower | null; // null bis Charakter die Kernmacht erhalten/gefunden hat
   selfAssignedRank: string | null; // z.B. "Captain" - von Spielern vergeben, nicht vom System
+  crewId: string | null; // nur relevant in der Ozeanwelt
   createdAt: string;
 }
