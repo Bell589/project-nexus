@@ -1,6 +1,6 @@
 # Project Nexus — Grundgerüst
 
-ok
+
 Monorepo (npm workspaces): `backend` (Express + TypeScript, In-Memory-Store) und
 `frontend` (React + Vite + TypeScript).
 
