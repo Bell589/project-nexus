@@ -1,4 +1,4 @@
-import type { World, Faction, Character, Crew, Fleet } from "../types/models";
+import type { World, Faction, Character, Crew, Fleet, Item, GameLocation, Mission, Enemy, CombatResult } from "../types/models";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, {
@@ -73,4 +73,51 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ crewId, characterId }),
     }),
+
+  getItems: () => request<Item[]>("/items"),
+
+  getLocations: (worldId: string) => request<GameLocation[]>(`/worlds/${worldId}/locations`),
+
+  getMissions: (characterId: string) => request<Mission[]>(`/missions/character/${characterId}`),
+  completeMission: (missionId: string, characterId: string) =>
+    request<Character>(`/missions/${missionId}/complete`, {
+      method: "POST",
+      body: JSON.stringify({ characterId }),
+    }),
+
+  getEnemies: (characterId: string) => request<Enemy[]>(`/combat/enemies/character/${characterId}`),
+  fight: (enemyId: string, characterId: string) =>
+    request<CombatResult>(`/combat/${enemyId}/fight`, {
+      method: "POST",
+      body: JSON.stringify({ characterId }),
+    }),
+
+  addItem: (characterId: string, itemId: string, quantity = 1) =>
+    request<Character>(`/characters/${characterId}/inventory/add`, {
+      method: "POST",
+      body: JSON.stringify({ itemId, quantity }),
+    }),
+  equipItem: (characterId: string, itemId: string) =>
+    request<Character>(`/characters/${characterId}/inventory/equip`, {
+      method: "POST",
+      body: JSON.stringify({ itemId }),
+    }),
+  unequipItem: (characterId: string, slot: ItemSlotName) =>
+    request<Character>(`/characters/${characterId}/inventory/unequip`, {
+      method: "POST",
+      body: JSON.stringify({ slot }),
+    }),
+  useConsumable: (characterId: string, itemId: string) =>
+    request<Character>(`/characters/${characterId}/inventory/use`, {
+      method: "POST",
+      body: JSON.stringify({ itemId }),
+    }),
+
+  trainSkill: (characterId: string, skillName: string) =>
+    request<Character>(`/characters/${characterId}/skills/train`, {
+      method: "POST",
+      body: JSON.stringify({ skillName }),
+    }),
 };
+
+type ItemSlotName = "waffe" | "ruestung" | "accessoire";

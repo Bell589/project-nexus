@@ -1,10 +1,12 @@
 import { nanoid } from "nanoid";
 import { WORLDS } from "../data/worlds.js";
 import { FACTIONS } from "../data/factions.js";
+import { ITEMS } from "../data/items.js";
 import { CharacterStore } from "../db/memoryStore.js";
 import { calculateKampfkraft } from "../types/kampfkraft.js";
 import type { Character } from "../types/character.js";
 import type { WorldId } from "../types/world.js";
+import type { KampfkraftComponents } from "../types/kampfkraft.js";
 
 export class ValidationError extends Error {}
 
@@ -47,6 +49,10 @@ export function createCharacter(input: CreateCharacterInput): Character {
     corePower: null, // wird erst freigeschaltet, sobald genug Kampfkraft erreicht ist
     selfAssignedRank: null,
     crewId: null,
+    inventory: [],
+    equipped: { waffe: null, ruestung: null, accessoire: null },
+    skills: [],
+    completedMissionIds: [],
     createdAt: new Date().toISOString(),
   };
 
@@ -64,5 +70,22 @@ export function listCharacters(): Character[] {
 }
 
 export function getKampfkraft(character: Character): number {
-  return calculateKampfkraft(character.kampfkraftComponents);
+  return calculateKampfkraft(effectiveKampfkraftComponents(character));
+}
+
+/** Basis-Kampfkraftkomponenten + Boni ausgerüsteter Items */
+export function effectiveKampfkraftComponents(character: Character): KampfkraftComponents {
+  const result: KampfkraftComponents = { ...character.kampfkraftComponents };
+  const equippedItemIds = Object.values(character.equipped).filter(
+    (id): id is string => id !== null
+  );
+  for (const itemId of equippedItemIds) {
+    const item = ITEMS.find((i) => i.id === itemId);
+    if (!item) continue;
+    for (const [key, bonus] of Object.entries(item.statBonuses)) {
+      const k = key as keyof KampfkraftComponents;
+      result[k] += bonus ?? 0;
+    }
+  }
+  return result;
 }

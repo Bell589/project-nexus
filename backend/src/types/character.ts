@@ -13,6 +13,22 @@ export interface CorePower {
   unlockedAbilities: string[];
 }
 
+export interface InventorySlot {
+  itemId: string;
+  quantity: number;
+}
+
+export interface EquippedItems {
+  waffe: string | null;
+  ruestung: string | null;
+  accessoire: string | null;
+}
+
+export interface CharacterSkill {
+  name: string;
+  level: number;
+}
+
 export interface Character {
   id: string;
   ownerName: string;
@@ -23,5 +39,9 @@ export interface Character {
   corePower: CorePower | null; // null bis Charakter die Kernmacht erhalten/gefunden hat
   selfAssignedRank: string | null; // z.B. "Captain" - von Spielern vergeben, nicht vom System
   crewId: string | null; // nur relevant in der Ozeanwelt
+  inventory: InventorySlot[];
+  equipped: EquippedItems;
+  skills: CharacterSkill[];
+  completedMissionIds: string[];
   createdAt: string;
 }

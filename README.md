@@ -1,6 +1,5 @@
 # Project Nexus — Grundgerüst
 
-
 Monorepo (npm workspaces): `backend` (Express + TypeScript, In-Memory-Store) und
 `frontend` (React + Vite + TypeScript).
 
@@ -29,46 +28,26 @@ project-nexus/
 
 ## Was ist bereits umgesetzt
 
-- **3 Welten** (Ozeanwelt, Soul Society, Avalon) mit **6 Fraktionen**, jede mit
-  eigenem Kernmacht-Label und eigenem Entwicklungspfad (Relikt-Stufen,
-  Seelenwaffe/Resurrección/Complete-Stufen, Magie-Stufen) — direkt aus deinem
-  Dokument übernommen.
-- **Kampfkraft-System**: aggregiert aus Erfahrung, Ausrüstung, Fähigkeiten,
-  Systembeherrschung, Erfolgen, Training — gewichtet, keine feste Obergrenze.
-  Im Frontend trainierbar (+10 pro Klick und Komponente).
-- **Kernmacht-Erwerb & Entwicklung**: Charakter startet ohne Kernmacht, muss
-  erst genug Kampfkraft sammeln (Schwelle 20), dann eigenen Archetyp + Namen
-  vergeben (z.B. "Relikt des Blitzes" → "Donner des Himmels"). Danach
-  Stufenaufstieg gegen steigende Kampfkraft-Schwellen
-  (`backend/src/types/corePowerThresholds.ts`), bis "Unbegrenzte
-  Weiterentwicklung" erreicht ist.
-- **Crew-System** (Ozeanwelt): Charakter gründet Crew (wird Captain) oder
-  tritt bestehender Crew der eigenen Fraktion bei. Captain vergibt Rollen
-  (Offizier, Kommandant, Stellvertreter, Mitglied) — komplett spielergeführt,
-  keine System-Level.
-- **Flotten-System** (Ozeanwelt): Crew-Captains können mehrere Crews zu einer
-  Flotte zusammenschließen (Backend-Endpunkte fertig, noch ohne Frontend-UI).
-- **Charaktererstellung**: Welt wählen → Fraktion wählen → Charakter anlegen.
-- **API**: `GET /api/worlds`, `GET /api/worlds/:id/factions`,
-  `POST /api/characters`, `GET /api/characters/:id`,
-  `POST /api/characters/:id/train`,
-  `POST /api/characters/:id/core-power/acquire`,
-  `POST /api/characters/:id/core-power/advance`,
-  `GET /api/crews`, `POST /api/crews`, `GET /api/crews/:id`,
-  `POST /api/crews/:id/join`, `POST /api/crews/:id/roles`,
-  `GET /api/fleets`, `POST /api/fleets`, `POST /api/fleets/:id/join`.
+- **3 Welten** mit **6 Fraktionen**, eigene Kernmacht-Pfade (Relikt-, Seelenwaffe/Resurrección/Complete-, Magie-Stufen).
+- **Kampfkraft-System**: 6 gewichtete Komponenten, keine feste Obergrenze, per Ausrüstung boostbar.
+- **Kernmacht-Erwerb & Stufenaufstieg** gegen steigende Kampfkraft-Schwellen.
+- **Crew-/Flotten-System** (Ozeanwelt): gründen, beitreten, Rollen vergeben, Flotten bilden.
+- **Inventar & Ausrüstung**: Item-Katalog, ausrüsten/ablegen, Verbrauchsgüter benutzen — Ausrüstungsboni fließen in Kampfkraft ein.
+- **Fähigkeiten**: Fraktions-Grundfähigkeiten trainierbar, Stufe gedeckelt durch Fähigkeiten-Kampfkraft.
+- **Karte**: Orte pro Welt (Inseln, Seelenbezirke, Orte der Macht, Ley-Linien-Knoten) — aktuell Listendarstellung, keine echte Grafik.
+- **Missionen**: pro Welt, mit Mindest-Kampfkraft und Belohnungen (Kampfkraft-Komponenten + optional Item).
+- **Kampfsystem**: vereinfachtes PvE gegen Gegner-Katalog, Sieg-Chance aus Kampfkraft-Verhältnis, kein Aktions-/Kombosystem.
+- **Startseite** mit Pitch + Einstieg, **Navileiste** mit Tabs (Übersicht, Inventar, Fähigkeiten, Karte, Missionen, Kampf, Crew).
 
 ## Was bewusst noch fehlt (nächste Schritte)
 
-- Persistente Datenbank (aktuell In-Memory, Daten weg bei Neustart)
+- Persistente Datenbank (aktuell In-Memory)
 - Authentifizierung / Spieler-Accounts
-- Flotten-Frontend-UI (Backend fertig)
-- Seelenbezirke (Soul Society), Arkanes Netzwerk (Avalon), Territorien
-  (Ozeanwelt) als eigene Systeme
-- Hollow-Evolution (Gillian→Adjuchas→Vasto Lorde) als eigener Ablauf statt
-  generischer Stufenaufstieg
+- Echtes Kampfsystem mit Aktionen/Kombos statt Wahrscheinlichkeits-Roll
+- Echte Kartengrafik/Koordinaten statt Listenansicht
+- Hollow-Evolution, Domänen-System, Arkanes Netzwerk als eigene interaktive Systeme
 - Fusion-System (Avalon)
-- Domänen-System (Soul Society)
+- Item-Shop/Drops statt manueller `inventory/add`-Testroute
 
 ## Installation & Start
 

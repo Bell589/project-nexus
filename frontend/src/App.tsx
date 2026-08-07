@@ -1,22 +1,26 @@
 import { useState } from "react";
+import { Home } from "./pages/Home";
 import { WorldSelect } from "./pages/WorldSelect";
 import { FactionSelect } from "./pages/FactionSelect";
 import { CharacterCreate } from "./pages/CharacterCreate";
-import { Dashboard } from "./pages/Dashboard";
+import { Game } from "./pages/Game";
 import type { World, Faction, Character } from "./types/models";
 
 type Step =
+  | { name: "home" }
   | { name: "world" }
   | { name: "faction"; world: World }
   | { name: "create"; world: World; faction: Faction }
-  | { name: "dashboard"; character: Character };
+  | { name: "game"; character: Character };
 
 export default function App() {
-  const [step, setStep] = useState<Step>({ name: "world" });
+  const [step, setStep] = useState<Step>({ name: "home" });
 
   return (
-    <main style={{ maxWidth: 720, margin: "0 auto", padding: 24, fontFamily: "system-ui" }}>
-      <h1>Project Nexus</h1>
+    <main style={{ maxWidth: 900, margin: "0 auto", padding: 24, fontFamily: "system-ui" }}>
+      {step.name !== "home" && <h1 style={{ fontSize: 22 }}>Project Nexus</h1>}
+
+      {step.name === "home" && <Home onStart={() => setStep({ name: "world" })} />}
 
       {step.name === "world" && (
         <WorldSelect onSelect={(world) => setStep({ name: "faction", world })} />
@@ -35,11 +39,11 @@ export default function App() {
           world={step.world}
           faction={step.faction}
           onBack={() => setStep({ name: "faction", world: step.world })}
-          onCreated={(character) => setStep({ name: "dashboard", character })}
+          onCreated={(character) => setStep({ name: "game", character })}
         />
       )}
 
-      {step.name === "dashboard" && <Dashboard character={step.character} />}
+      {step.name === "game" && <Game character={step.character} />}
     </main>
   );
 }
