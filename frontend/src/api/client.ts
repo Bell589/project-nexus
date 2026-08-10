@@ -1,4 +1,17 @@
-import type { World, Faction, Character, Crew, Fleet, Item, GameLocation, Mission, Enemy, CombatResult } from "../types/models";
+import type {
+  World,
+  Faction,
+  Character,
+  Crew,
+  Fleet,
+  Item,
+  GameLocation,
+  Mission,
+  Enemy,
+  CombatSession,
+  CombatAction,
+  DomainRule,
+} from "../types/models";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, {
@@ -26,6 +39,7 @@ export const api = {
       body: JSON.stringify(input),
     }),
   getCharacter: (id: string) => request<Character>(`/characters/${id}`),
+  listCharacters: () => request<Character[]>("/characters"),
 
   trainComponent: (characterId: string, component: string, amount: number) =>
     request<Character>(`/characters/${characterId}/train`, {
@@ -86,10 +100,35 @@ export const api = {
     }),
 
   getEnemies: (characterId: string) => request<Enemy[]>(`/combat/enemies/character/${characterId}`),
-  fight: (enemyId: string, characterId: string) =>
-    request<CombatResult>(`/combat/${enemyId}/fight`, {
+  startCombat: (enemyId: string, characterId: string) =>
+    request<CombatSession>(`/combat/${enemyId}/start`, {
       method: "POST",
       body: JSON.stringify({ characterId }),
+    }),
+  combatAction: (sessionId: string, action: CombatAction) =>
+    request<CombatSession>(`/combat/session/${sessionId}/action`, {
+      method: "POST",
+      body: JSON.stringify({ action }),
+    }),
+
+  getArcaneControllers: () => request<Record<string, string>>("/arcane-network/controllers"),
+  claimArcaneNode: (locationId: string, characterId: string) =>
+    request<Record<string, string>>(`/arcane-network/${locationId}/claim`, {
+      method: "POST",
+      body: JSON.stringify({ characterId }),
+    }),
+
+  getDomainRules: () => request<DomainRule[]>("/domain-rules"),
+  selectDomainRule: (characterId: string, ruleId: string) =>
+    request<Character>(`/characters/${characterId}/domain/select`, {
+      method: "POST",
+      body: JSON.stringify({ ruleId }),
+    }),
+
+  fuseCharacters: (characterAId: string, characterBId: string, newCharacterName: string) =>
+    request<Character>("/fusion", {
+      method: "POST",
+      body: JSON.stringify({ characterAId, characterBId, newCharacterName }),
     }),
 
   addItem: (characterId: string, itemId: string, quantity = 1) =>

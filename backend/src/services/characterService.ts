@@ -53,6 +53,8 @@ export function createCharacter(input: CreateCharacterInput): Character {
     equipped: { waffe: null, ruestung: null, accessoire: null },
     skills: [],
     completedMissionIds: [],
+    activeDomainRuleId: null,
+    fusedInto: null,
     createdAt: new Date().toISOString(),
   };
 

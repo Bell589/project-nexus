@@ -10,6 +10,7 @@ import { acquireCorePower, advanceCorePowerStage } from "../services/corePowerSe
 import { trainComponent } from "../services/trainingService.js";
 import { addItem, equipItem, unequipItem, useConsumable } from "../services/inventoryService.js";
 import { trainSkill } from "../services/skillService.js";
+import { selectDomainRule } from "../services/domainService.js";
 
 export const charactersRouter = Router();
 
@@ -144,6 +145,20 @@ charactersRouter.post("/:id/skills/train", (req, res) => {
   try {
     const { skillName } = req.body;
     const character = trainSkill(req.params.id, skillName);
+    res.json({ ...character, kampfkraft: getKampfkraft(character) });
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    throw err;
+  }
+});
+
+charactersRouter.post("/:id/domain/select", (req, res) => {
+  try {
+    const { ruleId } = req.body;
+    const character = selectDomainRule(req.params.id, ruleId);
     res.json({ ...character, kampfkraft: getKampfkraft(character) });
   } catch (err) {
     if (err instanceof ValidationError) {

@@ -7,6 +7,9 @@ import { fleetsRouter } from "./routes/fleets.js";
 import { itemsRouter } from "./routes/items.js";
 import { missionsRouter } from "./routes/missions.js";
 import { combatRouter } from "./routes/combat.js";
+import { arcaneNetworkRouter } from "./routes/arcaneNetwork.js";
+import { domainRulesRouter } from "./routes/domainRules.js";
+import { fusionRouter } from "./routes/fusion.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -22,6 +25,9 @@ app.use("/api/fleets", fleetsRouter);
 app.use("/api/items", itemsRouter);
 app.use("/api/missions", missionsRouter);
 app.use("/api/combat", combatRouter);
+app.use("/api/arcane-network", arcaneNetworkRouter);
+app.use("/api/domain-rules", domainRulesRouter);
+app.use("/api/fusion", fusionRouter);
 
 app.listen(PORT, () => {
   console.log(`Project Nexus API läuft auf http://localhost:${PORT}`);

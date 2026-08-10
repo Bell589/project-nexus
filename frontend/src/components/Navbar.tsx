@@ -5,7 +5,8 @@ export type GameView =
   | "map"
   | "missions"
   | "combat"
-  | "crew";
+  | "crew"
+  | "fusion";
 
 const TABS: { id: GameView; label: string }[] = [
   { id: "overview", label: "Übersicht" },
@@ -20,12 +21,16 @@ export function Navbar({
   active,
   onChange,
   showCrewTab,
+  showFusionTab,
 }: {
   active: GameView;
   onChange: (view: GameView) => void;
   showCrewTab: boolean;
+  showFusionTab: boolean;
 }) {
-  const tabs = showCrewTab ? [...TABS, { id: "crew" as GameView, label: "Crew" }] : TABS;
+  let tabs = TABS;
+  if (showCrewTab) tabs = [...tabs, { id: "crew" as GameView, label: "Crew" }];
+  if (showFusionTab) tabs = [...tabs, { id: "fusion" as GameView, label: "Fusion" }];
 
   return (
     <nav

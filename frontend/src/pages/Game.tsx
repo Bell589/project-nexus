@@ -8,6 +8,7 @@ import { MapPage } from "./MapPage";
 import { MissionsPage } from "./MissionsPage";
 import { CombatPage } from "./CombatPage";
 import { CrewPage } from "./CrewPage";
+import { FusionPage } from "./FusionPage";
 import type { Character, Faction } from "../types/models";
 
 export function Game({ character: initial }: { character: Character }) {
@@ -28,10 +29,11 @@ export function Game({ character: initial }: { character: Character }) {
   if (!faction) return <p>Lade...</p>;
 
   const showCrewTab = character.worldId === "ozeanwelt";
+  const showFusionTab = character.worldId === "avalon";
 
   return (
     <div>
-      <Navbar active={view} onChange={setView} showCrewTab={showCrewTab} />
+      <Navbar active={view} onChange={setView} showCrewTab={showCrewTab} showFusionTab={showFusionTab} />
 
       {view === "overview" && (
         <Dashboard character={character} faction={faction} onUpdated={setCharacter} />
@@ -44,6 +46,9 @@ export function Game({ character: initial }: { character: Character }) {
       {view === "missions" && <MissionsPage character={character} onUpdated={setCharacter} />}
       {view === "combat" && <CombatPage character={character} onUpdated={setCharacter} />}
       {view === "crew" && showCrewTab && <CrewPage character={character} onUpdated={setCharacter} />}
+      {view === "fusion" && showFusionTab && (
+        <FusionPage character={character} onFused={setCharacter} />
+      )}
     </div>
   );
 }

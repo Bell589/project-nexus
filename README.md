@@ -28,26 +28,39 @@ project-nexus/
 
 ## Was ist bereits umgesetzt
 
-- **3 Welten** mit **6 Fraktionen**, eigene Kernmacht-Pfade (Relikt-, Seelenwaffe/Resurrección/Complete-, Magie-Stufen).
-- **Kampfkraft-System**: 6 gewichtete Komponenten, keine feste Obergrenze, per Ausrüstung boostbar.
+- **3 Welten** mit **6 Fraktionen**, eigene Kernmacht-Pfade.
+- **Kampfkraft-System**: 6 gewichtete Komponenten, per Ausrüstung boostbar.
 - **Kernmacht-Erwerb & Stufenaufstieg** gegen steigende Kampfkraft-Schwellen.
-- **Crew-/Flotten-System** (Ozeanwelt): gründen, beitreten, Rollen vergeben, Flotten bilden.
-- **Inventar & Ausrüstung**: Item-Katalog, ausrüsten/ablegen, Verbrauchsgüter benutzen — Ausrüstungsboni fließen in Kampfkraft ein.
-- **Fähigkeiten**: Fraktions-Grundfähigkeiten trainierbar, Stufe gedeckelt durch Fähigkeiten-Kampfkraft.
-- **Karte**: Orte pro Welt (Inseln, Seelenbezirke, Orte der Macht, Ley-Linien-Knoten) — aktuell Listendarstellung, keine echte Grafik.
-- **Missionen**: pro Welt, mit Mindest-Kampfkraft und Belohnungen (Kampfkraft-Komponenten + optional Item).
-- **Kampfsystem**: vereinfachtes PvE gegen Gegner-Katalog, Sieg-Chance aus Kampfkraft-Verhältnis, kein Aktions-/Kombosystem.
-- **Startseite** mit Pitch + Einstieg, **Navileiste** mit Tabs (Übersicht, Inventar, Fähigkeiten, Karte, Missionen, Kampf, Crew).
+- **Crew-/Flotten-System** (Ozeanwelt): gründen, beitreten, Rollen vergeben.
+- **Inventar & Ausrüstung**, **Fähigkeiten**, **Missionen**.
+- **Kampfsystem mit Sessions**: Rundenkampf mit HP, Aktionen (Angriff,
+  Verteidigung, Spezialfähigkeit, Flucht) und Kombo-Zähler — Spezialfähigkeit
+  braucht Kombo 2+ und eine erworbene Kernmacht, Verteidigung reduziert
+  eingehenden Schaden um 60%, Flucht hat kraftabhängige Erfolgschance.
+- **Karte als SVG**: Orte mit Koordinaten, anklickbar, Detailpanel.
+- **Arkanes Netzwerk** (Avalon): arkane Knoten beanspruchen, stärkerer Magier
+  kann schwächeren verdrängen.
+- **Domänen** (Soul Society, Shinigami): ab Seelenwaffen-Stufe "Domäne" eine
+  Regel aus dem Domänen-Katalog aktivieren (aktuell nur Anzeige, noch nicht
+  mechanisch im Kampf verankert).
+- **Fusion** (Avalon, Magier): zwei Charaktere verschmelzen zu einem neuen,
+  kombinierte Kampfkraft/Fähigkeiten/Kernmacht, Ausgangscharaktere markiert
+  als fusioniert.
+- **Startseite**, **Navileiste** mit dynamischen Tabs je Welt (Crew nur
+  Ozeanwelt, Fusion nur Avalon).
 
-## Was bewusst noch fehlt (nächste Schritte)
+## Was bewusst noch fehlt / vereinfacht ist
 
 - Persistente Datenbank (aktuell In-Memory)
 - Authentifizierung / Spieler-Accounts
-- Echtes Kampfsystem mit Aktionen/Kombos statt Wahrscheinlichkeits-Roll
-- Echte Kartengrafik/Koordinaten statt Listenansicht
-- Hollow-Evolution, Domänen-System, Arkanes Netzwerk als eigene interaktive Systeme
-- Fusion-System (Avalon)
+- Domänen-Regeln wirken noch nicht mechanisch im Kampfsystem (nur Anzeige)
+- Hollow-Evolution läuft über das generische Kernmacht-Stufensystem statt
+  über einen eigenen Ablauf (Gillian→Adjuchas→Vasto Lorde sind bereits als
+  Stufen hinterlegt, siehe `backend/src/data/factions.ts`)
+- Kampf-Sessions sind stateless im Sinne von "kein Server-Neustart", gehen
+  bei Backend-Neustart verloren (wie der Rest der In-Memory-Daten)
 - Item-Shop/Drops statt manueller `inventory/add`-Testroute
+- Karte zeigt keine Bewegung/Reisezeit zwischen Orten, nur Klick-Details
 
 ## Installation & Start
 

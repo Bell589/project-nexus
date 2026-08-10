@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { fightEnemy, listEnemiesForCharacter } from "../services/combatService.js";
+import {
+  getCombatSession,
+  listEnemiesForCharacter,
+  performAction,
+  startCombat,
+} from "../services/combatService.js";
 import { ValidationError } from "../services/characterService.js";
 
 export const combatRouter = Router();
@@ -16,10 +21,35 @@ combatRouter.get("/enemies/character/:characterId", (req, res) => {
   }
 });
 
-combatRouter.post("/:enemyId/fight", (req, res) => {
+combatRouter.post("/:enemyId/start", (req, res) => {
   try {
     const { characterId } = req.body;
-    res.json(fightEnemy(characterId, req.params.enemyId));
+    res.status(201).json(startCombat(characterId, req.params.enemyId));
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    throw err;
+  }
+});
+
+combatRouter.get("/session/:sessionId", (req, res) => {
+  try {
+    res.json(getCombatSession(req.params.sessionId));
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      res.status(404).json({ error: err.message });
+      return;
+    }
+    throw err;
+  }
+});
+
+combatRouter.post("/session/:sessionId/action", (req, res) => {
+  try {
+    const { action } = req.body;
+    res.json(performAction(req.params.sessionId, action));
   } catch (err) {
     if (err instanceof ValidationError) {
       res.status(400).json({ error: err.message });

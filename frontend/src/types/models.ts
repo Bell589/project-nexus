@@ -39,6 +39,8 @@ export interface Character {
   equipped: { waffe: string | null; ruestung: string | null; accessoire: string | null };
   skills: { name: string; level: number }[];
   completedMissionIds: string[];
+  activeDomainRuleId: string | null;
+  fusedInto: string | null;
   createdAt: string;
   kampfkraft?: number;
 }
@@ -59,6 +61,8 @@ export interface GameLocation {
   name: string;
   type: string;
   description: string;
+  x: number;
+  y: number;
 }
 
 export interface Mission {
@@ -80,12 +84,37 @@ export interface Enemy {
   rewardComponents: Record<string, number>;
 }
 
-export interface CombatResult {
-  won: boolean;
-  characterPower: number;
-  enemyPower: number;
-  roll: number;
-  character: Character;
+export type CombatAction = "angriff" | "verteidigung" | "spezialfaehigkeit" | "flucht";
+export type CombatStatus = "laufend" | "gewonnen" | "verloren" | "geflohen";
+
+export interface CombatRoundLog {
+  round: number;
+  characterAction: CombatAction;
+  enemyAction: CombatAction;
+  damageToEnemy: number;
+  damageToCharacter: number;
+  note: string;
+}
+
+export interface CombatSession {
+  id: string;
+  characterId: string;
+  enemyId: string;
+  characterHp: number;
+  characterMaxHp: number;
+  enemyHp: number;
+  enemyMaxHp: number;
+  comboCount: number;
+  round: number;
+  status: CombatStatus;
+  log: CombatRoundLog[];
+  createdAt: string;
+}
+
+export interface DomainRule {
+  id: string;
+  name: string;
+  description: string;
 }
 
 export type CrewRole = "Captain" | "Offizier" | "Kommandant" | "Stellvertreter" | "Mitglied";

@@ -43,5 +43,7 @@ export interface Character {
   equipped: EquippedItems;
   skills: CharacterSkill[];
   completedMissionIds: string[];
+  activeDomainRuleId: string | null; // nur Shinigami ab Stufe "Domäne"
+  fusedInto: string | null; // gesetzt wenn Charakter per Fusion in einen neuen Charakter aufgegangen ist
   createdAt: string;
 }

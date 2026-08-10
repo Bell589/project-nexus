@@ -14,4 +14,7 @@ export interface Location {
   name: string;
   type: LocationType;
   description: string;
+  /** Position auf der Karte in Prozent (0-100), fürs Frontend-SVG */
+  x: number;
+  y: number;
 }
