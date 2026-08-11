@@ -55,6 +55,7 @@ export function createCharacter(input: CreateCharacterInput): Character {
     completedMissionIds: [],
     activeDomainRuleId: null,
     fusedInto: null,
+    spektralritterPact: null,
     createdAt: new Date().toISOString(),
   };
 

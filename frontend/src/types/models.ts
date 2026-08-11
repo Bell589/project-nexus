@@ -32,7 +32,13 @@ export interface Character {
     erfolge: number;
     training: number;
   };
-  corePower: { name: string; archetype: string; stageIndex: number; unlockedAbilities: string[] } | null;
+  corePower: {
+    name: string;
+    archetype: string;
+    archetypeId: string;
+    stageIndex: number;
+    unlockedAbilities: string[];
+  } | null;
   selfAssignedRank: string | null;
   crewId: string | null;
   inventory: { itemId: string; quantity: number }[];
@@ -41,8 +47,25 @@ export interface Character {
   completedMissionIds: string[];
   activeDomainRuleId: string | null;
   fusedInto: string | null;
+  spektralritterPact: { ritterId: string; name: string; stageIndex: number; unlockedAbilities: string[] } | null;
   createdAt: string;
   kampfkraft?: number;
+}
+
+export interface CorePowerArchetype {
+  id: string;
+  worldId: WorldId;
+  factionIds: string[];
+  name: string;
+  description: string;
+  abilitiesByStage: string[][];
+}
+
+export interface Spektralritter {
+  id: string;
+  name: string;
+  description: string;
+  abilitiesByStage: string[][];
 }
 
 export type ItemSlot = "waffe" | "ruestung" | "accessoire";

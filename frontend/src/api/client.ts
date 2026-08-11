@@ -11,6 +11,8 @@ import type {
   CombatSession,
   CombatAction,
   DomainRule,
+  CorePowerArchetype,
+  Spektralritter,
 } from "../types/models";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -47,10 +49,15 @@ export const api = {
       body: JSON.stringify({ component, amount }),
     }),
 
-  acquireCorePower: (characterId: string, archetype: string, name: string) =>
+  searchCorePower: (characterId: string) =>
+    request<CorePowerArchetype>(`/characters/${characterId}/core-power/search`, {
+      method: "POST",
+    }),
+
+  acquireCorePower: (characterId: string, archetypeId: string, personalName?: string) =>
     request<Character>(`/characters/${characterId}/core-power/acquire`, {
       method: "POST",
-      body: JSON.stringify({ archetype, name }),
+      body: JSON.stringify({ archetypeId, personalName }),
     }),
 
   advanceCorePower: (characterId: string) =>
@@ -156,6 +163,20 @@ export const api = {
     request<Character>(`/characters/${characterId}/skills/train`, {
       method: "POST",
       body: JSON.stringify({ skillName }),
+    }),
+
+  searchSpektralritter: (characterId: string) =>
+    request<Spektralritter>(`/characters/${characterId}/spektralritter/search`, {
+      method: "POST",
+    }),
+  formPact: (characterId: string, ritterId: string) =>
+    request<Character>(`/characters/${characterId}/spektralritter/pact`, {
+      method: "POST",
+      body: JSON.stringify({ ritterId }),
+    }),
+  advancePact: (characterId: string) =>
+    request<Character>(`/characters/${characterId}/spektralritter/advance`, {
+      method: "POST",
     }),
 };
 

@@ -56,6 +56,7 @@ export function fuseCharacters(
     corePower:
       a.corePower && b.corePower
         ? {
+            archetypeId: a.corePower.archetypeId,
             archetype: `Fusion: ${a.corePower.archetype} + ${b.corePower.archetype}`,
             name: `${a.corePower.name} / ${b.corePower.name}`,
             stageIndex: Math.max(a.corePower.stageIndex, b.corePower.stageIndex),
@@ -70,6 +71,7 @@ export function fuseCharacters(
     completedMissionIds: Array.from(new Set([...a.completedMissionIds, ...b.completedMissionIds])),
     activeDomainRuleId: null,
     fusedInto: null,
+    spektralritterPact: a.spektralritterPact ?? b.spektralritterPact,
     createdAt: new Date().toISOString(),
   };
 

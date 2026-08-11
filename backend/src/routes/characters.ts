@@ -6,11 +6,12 @@ import {
   listCharacters,
   ValidationError,
 } from "../services/characterService.js";
-import { acquireCorePower, advanceCorePowerStage } from "../services/corePowerService.js";
+import { acquireCorePower, advanceCorePowerStage, searchForCorePower } from "../services/corePowerService.js";
 import { trainComponent } from "../services/trainingService.js";
 import { addItem, equipItem, unequipItem, useConsumable } from "../services/inventoryService.js";
 import { trainSkill } from "../services/skillService.js";
 import { selectDomainRule } from "../services/domainService.js";
+import { advancePactStage, formPact, searchForSpektralritter } from "../services/spektralritterService.js";
 
 export const charactersRouter = Router();
 
@@ -58,10 +59,22 @@ charactersRouter.post("/:id/train", (req, res) => {
   }
 });
 
+charactersRouter.post("/:id/core-power/search", (req, res) => {
+  try {
+    res.json(searchForCorePower(req.params.id));
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    throw err;
+  }
+});
+
 charactersRouter.post("/:id/core-power/acquire", (req, res) => {
   try {
-    const { archetype, name } = req.body;
-    const character = acquireCorePower({ characterId: req.params.id, archetype, name });
+    const { archetypeId, personalName } = req.body;
+    const character = acquireCorePower({ characterId: req.params.id, archetypeId, personalName });
     res.json({ ...character, kampfkraft: getKampfkraft(character) });
   } catch (err) {
     if (err instanceof ValidationError) {
@@ -159,6 +172,45 @@ charactersRouter.post("/:id/domain/select", (req, res) => {
   try {
     const { ruleId } = req.body;
     const character = selectDomainRule(req.params.id, ruleId);
+    res.json({ ...character, kampfkraft: getKampfkraft(character) });
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    throw err;
+  }
+});
+
+charactersRouter.post("/:id/spektralritter/search", (req, res) => {
+  try {
+    res.json(searchForSpektralritter(req.params.id));
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    throw err;
+  }
+});
+
+charactersRouter.post("/:id/spektralritter/pact", (req, res) => {
+  try {
+    const { ritterId } = req.body;
+    const character = formPact(req.params.id, ritterId);
+    res.json({ ...character, kampfkraft: getKampfkraft(character) });
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    throw err;
+  }
+});
+
+charactersRouter.post("/:id/spektralritter/advance", (req, res) => {
+  try {
+    const character = advancePactStage(req.params.id);
     res.json({ ...character, kampfkraft: getKampfkraft(character) });
   } catch (err) {
     if (err instanceof ValidationError) {

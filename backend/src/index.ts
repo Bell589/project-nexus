@@ -10,6 +10,7 @@ import { combatRouter } from "./routes/combat.js";
 import { arcaneNetworkRouter } from "./routes/arcaneNetwork.js";
 import { domainRulesRouter } from "./routes/domainRules.js";
 import { fusionRouter } from "./routes/fusion.js";
+import { catalogsRouter } from "./routes/catalogs.js";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -28,6 +29,7 @@ app.use("/api/combat", combatRouter);
 app.use("/api/arcane-network", arcaneNetworkRouter);
 app.use("/api/domain-rules", domainRulesRouter);
 app.use("/api/fusion", fusionRouter);
+app.use("/api/catalogs", catalogsRouter);
 
 app.listen(PORT, () => {
   console.log(`Project Nexus API läuft auf http://localhost:${PORT}`);

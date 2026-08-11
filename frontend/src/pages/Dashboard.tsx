@@ -1,6 +1,7 @@
 import { TrainingPanel } from "../components/TrainingPanel";
 import { CorePowerPanel } from "../components/CorePowerPanel";
 import { DomainPanel } from "../components/DomainPanel";
+import { SpektralritterPanel } from "../components/SpektralritterPanel";
 import type { Character, Faction } from "../types/models";
 
 export function Dashboard({
@@ -24,6 +25,7 @@ export function Dashboard({
       <TrainingPanel character={character} onUpdated={onUpdated} />
       <CorePowerPanel character={character} faction={faction} onUpdated={onUpdated} />
       <DomainPanel character={character} onUpdated={onUpdated} />
+      <SpektralritterPanel character={character} onUpdated={onUpdated} />
     </section>
   );
 }

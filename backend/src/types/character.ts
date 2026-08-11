@@ -7,8 +7,16 @@ import type { KampfkraftComponents } from "./kampfkraft.js";
  * stageIndex zeigt auf world.corePowerStages[stageIndex].
  */
 export interface CorePower {
-  name: string; // z.B. "Donner des Himmels"
-  archetype: string; // z.B. "Relikt des Blitzes"
+  name: string; // z.B. "Donner des Himmels" (persönlicher Name, optional vom Spieler vergeben)
+  archetype: string; // Anzeigename des Archetyps aus dem Katalog
+  archetypeId: string; // Referenz auf CorePowerArchetype.id
+  stageIndex: number;
+  unlockedAbilities: string[];
+}
+
+export interface SpektralritterPact {
+  ritterId: string;
+  name: string;
   stageIndex: number;
   unlockedAbilities: string[];
 }
@@ -45,5 +53,6 @@ export interface Character {
   completedMissionIds: string[];
   activeDomainRuleId: string | null; // nur Shinigami ab Stufe "Domäne"
   fusedInto: string | null; // gesetzt wenn Charakter per Fusion in einen neuen Charakter aufgegangen ist
+  spektralritterPact: SpektralritterPact | null; // nur Avalon/Magier
   createdAt: string;
 }

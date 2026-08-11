@@ -1,19 +1,26 @@
 import { FACTIONS } from "../data/factions.js";
+import { CORE_POWER_ARCHETYPES } from "../data/corePowerArchetypes.js";
 import { CharacterStore } from "../db/memoryStore.js";
 import { getKampfkraft } from "./characterService.js";
 import { stageThresholdFor } from "../types/corePowerThresholds.js";
 import { ValidationError } from "./characterService.js";
 import type { Character } from "../types/character.js";
+import type { CorePowerArchetype } from "../types/corePowerArchetype.js";
 
-interface AcquireInput {
-  characterId: string;
-  archetype: string; // z.B. "Relikt des Blitzes"
-  name: string; // z.B. "Donner des Himmels"
+function archetypesFor(character: Character): CorePowerArchetype[] {
+  return CORE_POWER_ARCHETYPES.filter(
+    (a) => a.worldId === character.worldId && a.factionIds.includes(character.factionId)
+  );
 }
 
-export function acquireCorePower(input: AcquireInput): Character {
-  const character = CharacterStore.get(input.characterId);
-  if (!character) throw new ValidationError(`Charakter "${input.characterId}" nicht gefunden`);
+/**
+ * "Finden" statt frei eintippen: liefert eine zufällige, noch nicht gebundene
+ * Kernmacht aus dem Katalog der eigenen Welt/Fraktion. Bindet noch nichts -
+ * das passiert erst über acquireCorePower mit der gefundenen archetypeId.
+ */
+export function searchForCorePower(characterId: string): CorePowerArchetype {
+  const character = CharacterStore.get(characterId);
+  if (!character) throw new ValidationError(`Charakter "${characterId}" nicht gefunden`);
   if (character.corePower) {
     throw new ValidationError("Charakter besitzt bereits eine Kernmacht");
   }
@@ -26,15 +33,48 @@ export function acquireCorePower(input: AcquireInput): Character {
     );
   }
 
-  if (!input.archetype?.trim() || !input.name?.trim()) {
-    throw new ValidationError("archetype und name dürfen nicht leer sein");
+  const candidates = archetypesFor(character);
+  if (candidates.length === 0) {
+    throw new ValidationError("Kein Kernmacht-Archetyp für diese Welt/Fraktion im Katalog");
+  }
+
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+interface AcquireInput {
+  characterId: string;
+  archetypeId: string;
+  personalName?: string;
+}
+
+/** Bindet eine zuvor gefundene Kernmacht (archetypeId muss aus searchForCorePower stammen). */
+export function acquireCorePower(input: AcquireInput): Character {
+  const character = CharacterStore.get(input.characterId);
+  if (!character) throw new ValidationError(`Charakter "${input.characterId}" nicht gefunden`);
+  if (character.corePower) {
+    throw new ValidationError("Charakter besitzt bereits eine Kernmacht");
+  }
+
+  const archetype = CORE_POWER_ARCHETYPES.find((a) => a.id === input.archetypeId);
+  if (!archetype) throw new ValidationError(`Archetyp "${input.archetypeId}" nicht im Katalog`);
+  if (archetype.worldId !== character.worldId || !archetype.factionIds.includes(character.factionId)) {
+    throw new ValidationError("Dieser Archetyp gehört nicht zur Welt/Fraktion des Charakters");
+  }
+
+  const kampfkraft = getKampfkraft(character);
+  const requiredMin = stageThresholdFor(0);
+  if (kampfkraft < requiredMin) {
+    throw new ValidationError(
+      `Kampfkraft zu niedrig (${kampfkraft.toFixed(0)}/${requiredMin}). Trainiere erst weiter.`
+    );
   }
 
   character.corePower = {
-    archetype: input.archetype.trim(),
-    name: input.name.trim(),
+    archetypeId: archetype.id,
+    archetype: archetype.name,
+    name: input.personalName?.trim() || archetype.name,
     stageIndex: 0,
-    unlockedAbilities: [],
+    unlockedAbilities: [...archetype.abilitiesByStage[0]],
   };
 
   return CharacterStore.save(character);
@@ -50,18 +90,17 @@ export function advanceCorePowerStage(characterId: string): Character {
   const faction = FACTIONS.find((f) => f.id === character.factionId);
   if (!faction) throw new ValidationError("Fraktion nicht gefunden");
 
-  const nextStageIndex = character.corePower.stageIndex + 1;
-  const isFinalStage = nextStageIndex >= faction.corePowerStages.length - 1;
-  const maxStageIndex = faction.corePowerStages.length - 1;
+  const archetype = CORE_POWER_ARCHETYPES.find((a) => a.id === character.corePower!.archetypeId);
+  if (!archetype) throw new ValidationError("Archetyp nicht mehr im Katalog gefunden");
 
+  const maxStageIndex = faction.corePowerStages.length - 1;
   if (character.corePower.stageIndex >= maxStageIndex) {
-    // Letzte Stufe = "Unbegrenzte Weiterentwicklung" - kein Deckel mehr,
-    // aber es gibt keine weitere benannte Stufe zum Freischalten.
     throw new ValidationError(
       "Kernmacht ist bereits in unbegrenzter Weiterentwicklung - keine weitere Stufe zum Freischalten."
     );
   }
 
+  const nextStageIndex = character.corePower.stageIndex + 1;
   const kampfkraft = getKampfkraft(character);
   const required = stageThresholdFor(nextStageIndex);
   if (kampfkraft < required) {
@@ -71,10 +110,8 @@ export function advanceCorePowerStage(characterId: string): Character {
   }
 
   character.corePower.stageIndex = nextStageIndex;
-  const stageName = faction.corePowerStages[nextStageIndex];
-  character.corePower.unlockedAbilities.push(
-    isFinalStage ? `${stageName} erreicht` : `Stufe erreicht: ${stageName}`
-  );
+  const newAbilities = archetype.abilitiesByStage[nextStageIndex] ?? [];
+  character.corePower.unlockedAbilities.push(...newAbilities);
 
   return CharacterStore.save(character);
 }
