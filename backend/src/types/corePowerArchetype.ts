@@ -4,7 +4,8 @@ export interface CorePowerArchetype {
   id: string;
   worldId: WorldId;
   factionIds: string[]; // z.B. ["piraten","marine"] wenn mehrere Fraktionen dasselbe System teilen
-  name: string; // z.B. "Relikt des Blitzes", "Zanpakutō des Feuers", "Blitzmagie"
+  typeLabel: string; // Kategorie, z.B. "Elementar-Relikt: Blitz", "Tier-Relikt: Drache"
+  properName: string; // fester, eindeutiger Name, z.B. "Raiun", "Long" - NICHT vom Spieler wählbar
   description: string;
   /** abilitiesByStage[stageIndex] = Fähigkeiten, die beim Erreichen dieser Stufe freigeschaltet werden */
   abilitiesByStage: string[][];

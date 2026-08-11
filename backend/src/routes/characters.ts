@@ -73,8 +73,8 @@ charactersRouter.post("/:id/core-power/search", (req, res) => {
 
 charactersRouter.post("/:id/core-power/acquire", (req, res) => {
   try {
-    const { archetypeId, personalName } = req.body;
-    const character = acquireCorePower({ characterId: req.params.id, archetypeId, personalName });
+    const { archetypeId } = req.body;
+    const character = acquireCorePower(req.params.id, archetypeId);
     res.json({ ...character, kampfkraft: getKampfkraft(character) });
   } catch (err) {
     if (err instanceof ValidationError) {

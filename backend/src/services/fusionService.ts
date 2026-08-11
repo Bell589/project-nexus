@@ -57,7 +57,7 @@ export function fuseCharacters(
       a.corePower && b.corePower
         ? {
             archetypeId: a.corePower.archetypeId,
-            archetype: `Fusion: ${a.corePower.archetype} + ${b.corePower.archetype}`,
+            typeLabel: `Fusion: ${a.corePower.typeLabel} + ${b.corePower.typeLabel}`,
             name: `${a.corePower.name} / ${b.corePower.name}`,
             stageIndex: Math.max(a.corePower.stageIndex, b.corePower.stageIndex),
             unlockedAbilities: [...a.corePower.unlockedAbilities, ...b.corePower.unlockedAbilities],

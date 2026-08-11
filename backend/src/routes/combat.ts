@@ -48,8 +48,8 @@ combatRouter.get("/session/:sessionId", (req, res) => {
 
 combatRouter.post("/session/:sessionId/action", (req, res) => {
   try {
-    const { action } = req.body;
-    res.json(performAction(req.params.sessionId, action));
+    const { action, abilityName } = req.body;
+    res.json(performAction(req.params.sessionId, action, abilityName));
   } catch (err) {
     if (err instanceof ValidationError) {
       res.status(400).json({ error: err.message });

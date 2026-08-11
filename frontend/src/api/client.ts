@@ -54,10 +54,10 @@ export const api = {
       method: "POST",
     }),
 
-  acquireCorePower: (characterId: string, archetypeId: string, personalName?: string) =>
+  acquireCorePower: (characterId: string, archetypeId: string) =>
     request<Character>(`/characters/${characterId}/core-power/acquire`, {
       method: "POST",
-      body: JSON.stringify({ archetypeId, personalName }),
+      body: JSON.stringify({ archetypeId }),
     }),
 
   advanceCorePower: (characterId: string) =>
@@ -112,10 +112,10 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ characterId }),
     }),
-  combatAction: (sessionId: string, action: CombatAction) =>
+  combatAction: (sessionId: string, action: CombatAction, abilityName?: string) =>
     request<CombatSession>(`/combat/session/${sessionId}/action`, {
       method: "POST",
-      body: JSON.stringify({ action }),
+      body: JSON.stringify({ action, abilityName }),
     }),
 
   getArcaneControllers: () => request<Record<string, string>>("/arcane-network/controllers"),

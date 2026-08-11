@@ -7,8 +7,8 @@ import type { KampfkraftComponents } from "./kampfkraft.js";
  * stageIndex zeigt auf world.corePowerStages[stageIndex].
  */
 export interface CorePower {
-  name: string; // z.B. "Donner des Himmels" (persönlicher Name, optional vom Spieler vergeben)
-  archetype: string; // Anzeigename des Archetyps aus dem Katalog
+  name: string; // fester Eigenname aus dem Katalog, z.B. "Raiun" - NICHT vom Spieler wählbar
+  typeLabel: string; // Kategorie, z.B. "Elementar-Relikt: Blitz"
   archetypeId: string; // Referenz auf CorePowerArchetype.id
   stageIndex: number;
   unlockedAbilities: string[];

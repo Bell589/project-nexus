@@ -34,7 +34,7 @@ export interface Character {
   };
   corePower: {
     name: string;
-    archetype: string;
+    typeLabel: string;
     archetypeId: string;
     stageIndex: number;
     unlockedAbilities: string[];
@@ -56,7 +56,8 @@ export interface CorePowerArchetype {
   id: string;
   worldId: WorldId;
   factionIds: string[];
-  name: string;
+  typeLabel: string;
+  properName: string;
   description: string;
   abilitiesByStage: string[][];
 }
@@ -116,6 +117,7 @@ export interface CombatRoundLog {
   enemyAction: CombatAction;
   damageToEnemy: number;
   damageToCharacter: number;
+  abilityUsed: string | null;
   note: string;
 }
 

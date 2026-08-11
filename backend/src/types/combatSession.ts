@@ -7,6 +7,7 @@ export interface CombatRoundLog {
   enemyAction: CombatAction;
   damageToEnemy: number;
   damageToCharacter: number;
+  abilityUsed: string | null;
   note: string;
 }
 

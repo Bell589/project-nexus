@@ -30,20 +30,23 @@ project-nexus/
 
 - **3 Welten** mit **6 Fraktionen**, eigene Kernmacht-Pfade.
 - **Kampfkraft-System**: 6 gewichtete Komponenten, per Ausrüstung boostbar.
-- **Kernmacht ist jetzt katalogbasiert statt frei eintippbar**: Relikte
-  (Ozeanwelt), Zanpakutō/Resurrección-Formen/Complete-Typen (Soul Society je
-  Fraktion), Magie-Schulen (Avalon) kommen aus einem festen Katalog
-  (`backend/src/data/corePowerArchetypes.ts`). Ablauf: "Suchen" liefert einen
-  zufälligen Kandidaten aus dem Katalog der eigenen Welt/Fraktion, "Binden"
-  fixiert ihn (nur ein optionaler persönlicher Name bleibt frei wählbar,
-  passend zum Doku-Beispiel "Relikt des Blitzes" → "Donner des Himmels").
-  Jede Stufe schaltet vordefinierte, im Katalog hinterlegte Fähigkeiten frei
-  statt generischer Text-Notizen.
-- **Spektralritter-System (neu, Avalon)**: eigener Katalog
-  (`backend/src/data/spektralritter.ts`), unabhängig von der einzigartigen
-  Magie. Ablauf: suchen → Pakt schließen → Stufenaufstieg (Vertrag →
-  Resonanz → Rüstung → Teilverschmelzung → Vollständige Verschmelzung →
-  Unbegrenzte Weiterentwicklung), jede Stufe mit vordefinierten Fähigkeiten.
+- **Kernmacht ist katalogbasiert, komplett ohne Freitext**: Relikte (feste
+  Eigennamen wie "Raiun", "Long"), Zanpakutō/Resurrección/Complete (Soul
+  Society je Fraktion, z.B. "Enraku", "Lobo Sombrío"), Magie (Avalon, z.B.
+  "Raiten", "Chronos-Magie") — jeder Eintrag hat `typeLabel` (Kategorie, z.B.
+  "Tier-Relikt: Drache") und `properName` (fester Name, z.B. "Long"), beide
+  aus dem Katalog, nirgends vom Spieler eingebbar
+  (`backend/src/data/corePowerArchetypes.ts`). Ablauf: Suchen → Binden.
+- **Spektralritter-System** (Avalon): eigener Katalog, unabhängig von der
+  Magie, ebenfalls feste Namen (z.B. "Ritter des Morgengrauens").
+- **Fähigkeiten aktiv im Kampf nutzbar**: bei der Aktion "Spezialfähigkeit"
+  wählt man aus den tatsächlich freigeschalteten, vordefinierten Fähigkeiten
+  (aus Kernmacht und/oder Spektralritter-Pakt) - keine generische Aktion mehr.
+  Schaden skaliert mit der erreichten Stufe der jeweiligen Fähigkeit.
+- **Stärkere Testgegner** pro Welt (Yonko-Kapitän, Flottenadmiral,
+  Captain-Klasse Shinigami, Vasto-Lorde-Anführer, Gefallener Erzmagier,
+  Spektral-Tyrann) mit 300-500 Kampfkraft, um Spezialfähigkeiten wirklich zu
+  fordern.
 - **Katalog-Endpunkte** zum Nachschlagen: `GET /api/catalogs/core-power-archetypes?worldId=&factionId=`, `GET /api/catalogs/spektralritter`.
 - **Crew-/Flotten-System** (Ozeanwelt): gründen, beitreten, Rollen vergeben.
 - **Inventar & Ausrüstung**, **Fähigkeiten**, **Missionen**.
@@ -69,8 +72,7 @@ project-nexus/
 - Authentifizierung / Spieler-Accounts
 - Domänen-Regeln wirken noch nicht mechanisch im Kampfsystem (nur Anzeige)
 - "Finden" ist aktuell ein reiner Zufalls-Pull aus dem Katalog, nicht an
-  Standorte auf der Karte gekoppelt (z.B. Magie eigentlich ortsgebunden an
-  "Orte der Macht" — aktuell global suchbar)
+  Standorte auf der Karte gekoppelt
 - Kein Uniqueness-Constraint: mehrere Charaktere können denselben Archetyp
   oder Spektralritter finden/binden
 - Kampf-Sessions gehen bei Backend-Neustart verloren (wie der Rest der

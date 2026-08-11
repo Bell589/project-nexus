@@ -14,9 +14,9 @@ function archetypesFor(character: Character): CorePowerArchetype[] {
 }
 
 /**
- * "Finden" statt frei eintippen: liefert eine zufällige, noch nicht gebundene
- * Kernmacht aus dem Katalog der eigenen Welt/Fraktion. Bindet noch nichts -
- * das passiert erst über acquireCorePower mit der gefundenen archetypeId.
+ * "Finden" statt frei eintippen: liefert eine zufällige, feste Kernmacht aus
+ * dem Katalog der eigenen Welt/Fraktion - mit festem Eigennamen. Bindet noch
+ * nichts, das passiert erst über acquireCorePower.
  */
 export function searchForCorePower(characterId: string): CorePowerArchetype {
   const character = CharacterStore.get(characterId);
@@ -41,22 +41,16 @@ export function searchForCorePower(characterId: string): CorePowerArchetype {
   return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
-interface AcquireInput {
-  characterId: string;
-  archetypeId: string;
-  personalName?: string;
-}
-
-/** Bindet eine zuvor gefundene Kernmacht (archetypeId muss aus searchForCorePower stammen). */
-export function acquireCorePower(input: AcquireInput): Character {
-  const character = CharacterStore.get(input.characterId);
-  if (!character) throw new ValidationError(`Charakter "${input.characterId}" nicht gefunden`);
+/** Bindet eine zuvor gefundene Kernmacht (archetypeId muss aus searchForCorePower stammen). Kein Freitext möglich. */
+export function acquireCorePower(characterId: string, archetypeId: string): Character {
+  const character = CharacterStore.get(characterId);
+  if (!character) throw new ValidationError(`Charakter "${characterId}" nicht gefunden`);
   if (character.corePower) {
     throw new ValidationError("Charakter besitzt bereits eine Kernmacht");
   }
 
-  const archetype = CORE_POWER_ARCHETYPES.find((a) => a.id === input.archetypeId);
-  if (!archetype) throw new ValidationError(`Archetyp "${input.archetypeId}" nicht im Katalog`);
+  const archetype = CORE_POWER_ARCHETYPES.find((a) => a.id === archetypeId);
+  if (!archetype) throw new ValidationError(`Archetyp "${archetypeId}" nicht im Katalog`);
   if (archetype.worldId !== character.worldId || !archetype.factionIds.includes(character.factionId)) {
     throw new ValidationError("Dieser Archetyp gehört nicht zur Welt/Fraktion des Charakters");
   }
@@ -71,8 +65,8 @@ export function acquireCorePower(input: AcquireInput): Character {
 
   character.corePower = {
     archetypeId: archetype.id,
-    archetype: archetype.name,
-    name: input.personalName?.trim() || archetype.name,
+    typeLabel: archetype.typeLabel,
+    name: archetype.properName,
     stageIndex: 0,
     unlockedAbilities: [...archetype.abilitiesByStage[0]],
   };

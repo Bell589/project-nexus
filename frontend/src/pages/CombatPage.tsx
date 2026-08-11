@@ -58,12 +58,12 @@ export function CombatPage({
     }
   }
 
-  async function act(action: CombatAction) {
+  async function act(action: CombatAction, abilityName?: string) {
     if (!session) return;
     setBusy(true);
     setError(null);
     try {
-      const updated = await api.combatAction(session.id, action);
+      const updated = await api.combatAction(session.id, action, abilityName);
       setSession(updated);
       if (updated.status === "gewonnen") {
         const character = await api.getCharacter(session.characterId);
@@ -103,6 +103,10 @@ export function CombatPage({
 
   if (session) {
     const enemy = enemies.find((e) => e.id === session.enemyId);
+    const abilityPool = [
+      ...(character.corePower?.unlockedAbilities ?? []),
+      ...(character.spektralritterPact?.unlockedAbilities ?? []),
+    ];
     return (
       <section>
         <h2>Kampf: {enemy?.name ?? session.enemyId}</h2>
@@ -110,14 +114,34 @@ export function CombatPage({
         <HpBar label={character.characterName} hp={session.characterHp} maxHp={session.characterMaxHp} />
         <HpBar label={enemy?.name ?? "Gegner"} hp={session.enemyHp} maxHp={session.enemyMaxHp} />
         <p style={{ fontSize: 13, color: "#777" }}>
-          Kombo: {session.comboCount} (Spezialfähigkeit ab Kombo 2, benötigt Kernmacht)
+          Kombo: {session.comboCount} (Spezialfähigkeit ab Kombo 2, benötigt Kernmacht oder
+          Spektralritter-Pakt)
         </p>
-        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-          {ACTIONS.map((a) => (
+        <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+          {ACTIONS.filter((a) => a.id !== "spezialfaehigkeit").map((a) => (
             <button key={a.id} disabled={busy} onClick={() => act(a.id)}>
               {a.label}
             </button>
           ))}
+          {abilityPool.length > 0 && (
+            <select
+              disabled={busy}
+              defaultValue=""
+              onChange={(e) => {
+                if (e.target.value) act("spezialfaehigkeit", e.target.value);
+                e.target.value = "";
+              }}
+            >
+              <option value="" disabled>
+                Spezialfähigkeit wählen...
+              </option>
+              {abilityPool.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <RoundLog session={session} />
       </section>
@@ -151,7 +175,8 @@ function RoundLog({ session }: { session: CombatSession }) {
         .reverse()
         .map((r) => (
           <div key={r.round} style={{ padding: "4px 0", borderTop: "1px solid #eee" }}>
-            Runde {r.round}: Du ({r.characterAction}) → {r.damageToEnemy} Schaden &middot; Gegner (
+            Runde {r.round}: Du ({r.characterAction}
+            {r.abilityUsed ? `: ${r.abilityUsed}` : ""}) → {r.damageToEnemy} Schaden &middot; Gegner (
             {r.enemyAction}) → {r.damageToCharacter} Schaden {r.note !== "-" ? `— ${r.note}` : ""}
           </div>
         ))}

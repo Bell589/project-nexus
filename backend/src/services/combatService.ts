@@ -58,7 +58,26 @@ function randomVariance(base: number): number {
   return base * (0.8 + Math.random() * 0.4); // ±20%
 }
 
-export function performAction(sessionId: string, action: CombatAction): CombatSession {
+function unlockedAbilityPool(character: Character): { name: string; stageIndex: number }[] {
+  const pool: { name: string; stageIndex: number }[] = [];
+  if (character.corePower) {
+    for (const name of character.corePower.unlockedAbilities) {
+      pool.push({ name, stageIndex: character.corePower.stageIndex });
+    }
+  }
+  if (character.spektralritterPact) {
+    for (const name of character.spektralritterPact.unlockedAbilities) {
+      pool.push({ name, stageIndex: character.spektralritterPact.stageIndex });
+    }
+  }
+  return pool;
+}
+
+export function performAction(
+  sessionId: string,
+  action: CombatAction,
+  abilityName?: string
+): CombatSession {
   const session = CombatSessionStore.get(sessionId);
   if (!session) throw new ValidationError(`Kampf-Session "${sessionId}" nicht gefunden`);
   if (session.status !== "laufend") {
@@ -70,15 +89,27 @@ export function performAction(sessionId: string, action: CombatAction): CombatSe
   const enemy = ENEMIES.find((e) => e.id === session.enemyId);
   if (!enemy) throw new ValidationError("Gegner nicht gefunden");
 
+  let usedAbilityStageIndex = 0;
+
   if (action === "spezialfaehigkeit") {
-    if (!character.corePower) {
-      throw new ValidationError("Spezialfähigkeit erfordert eine erworbene Kernmacht");
+    const pool = unlockedAbilityPool(character);
+    if (pool.length === 0) {
+      throw new ValidationError(
+        "Spezialfähigkeit erfordert eine erworbene Kernmacht oder einen Spektralritter-Pakt mit freigeschalteten Fähigkeiten"
+      );
     }
     if (session.comboCount < 2) {
       throw new ValidationError(
         `Spezialfähigkeit braucht Kombo 2+ (aktuell ${session.comboCount}). Erst mehrfach angreifen.`
       );
     }
+    const match = pool.find((p) => p.name === abilityName);
+    if (!match) {
+      throw new ValidationError(
+        `abilityName muss eine freigeschaltete Fähigkeit sein. Verfügbar: ${pool.map((p) => p.name).join(", ")}`
+      );
+    }
+    usedAbilityStageIndex = match.stageIndex;
   }
 
   const characterPower = getKampfkraft(character);
@@ -94,9 +125,10 @@ export function performAction(sessionId: string, action: CombatAction): CombatSe
     damageToEnemy = randomVariance(characterPower * 0.22);
     session.comboCount += 1;
   } else if (action === "spezialfaehigkeit") {
-    damageToEnemy = randomVariance(characterPower * 0.45);
+    const stageBonus = 1 + usedAbilityStageIndex * 0.15; // stärkere Stufen treffen härter
+    damageToEnemy = randomVariance(characterPower * 0.45 * stageBonus);
     session.comboCount = 0;
-    note = "Spezialfähigkeit der Kernmacht entfesselt! ";
+    note = `"${abilityName}" entfesselt! `;
   } else if (action === "verteidigung") {
     damageToEnemy = randomVariance(characterPower * 0.05); // kleiner Konter
     session.comboCount = 0;
@@ -111,6 +143,7 @@ export function performAction(sessionId: string, action: CombatAction): CombatSe
         enemyAction,
         damageToEnemy: 0,
         damageToCharacter: 0,
+        abilityUsed: null,
         note: "Flucht erfolgreich.",
       });
       return CombatSessionStore.save(session);
@@ -145,6 +178,7 @@ export function performAction(sessionId: string, action: CombatAction): CombatSe
     enemyAction,
     damageToEnemy: Math.round(damageToEnemy),
     damageToCharacter: Math.round(damageToCharacter),
+    abilityUsed: action === "spezialfaehigkeit" ? abilityName ?? null : null,
     note: note || "-",
   });
 
