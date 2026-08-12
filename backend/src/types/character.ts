@@ -1,5 +1,6 @@
 import type { WorldId } from "./world.js";
 import type { KampfkraftComponents } from "./kampfkraft.js";
+import type { Ability } from "./ability.js";
 
 /**
  * Konkrete Instanz der Kernmacht eines Charakters (Relikt, Seelenwaffe,
@@ -11,14 +12,14 @@ export interface CorePower {
   typeLabel: string; // Kategorie, z.B. "Elementar-Relikt: Blitz"
   archetypeId: string; // Referenz auf CorePowerArchetype.id
   stageIndex: number;
-  unlockedAbilities: string[];
+  unlockedAbilities: Ability[];
 }
 
 export interface SpektralritterPact {
   ritterId: string;
   name: string;
   stageIndex: number;
-  unlockedAbilities: string[];
+  unlockedAbilities: Ability[];
 }
 
 export interface InventorySlot {

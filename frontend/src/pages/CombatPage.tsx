@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client";
-import type { Character, CombatAction, CombatSession, Enemy } from "../types/models";
+import type { Ability, Character, CombatAction, CombatSession, Enemy } from "../types/models";
 
 function HpBar({ label, hp, maxHp }: { label: string; hp: number; maxHp: number }) {
   const pct = Math.max(0, Math.min(100, (hp / maxHp) * 100));
@@ -103,7 +103,7 @@ export function CombatPage({
 
   if (session) {
     const enemy = enemies.find((e) => e.id === session.enemyId);
-    const abilityPool = [
+    const abilityPool: Ability[] = [
       ...(character.corePower?.unlockedAbilities ?? []),
       ...(character.spektralritterPact?.unlockedAbilities ?? []),
     ];
@@ -113,8 +113,16 @@ export function CombatPage({
         {error && <p style={{ color: "crimson" }}>{error}</p>}
         <HpBar label={character.characterName} hp={session.characterHp} maxHp={session.characterMaxHp} />
         <HpBar label={enemy?.name ?? "Gegner"} hp={session.enemyHp} maxHp={session.enemyMaxHp} />
+        {session.activePowerup && (
+          <p style={{ fontSize: 13, background: "#fff3e0", borderRadius: 6, padding: "6px 10px" }}>
+            Powerup aktiv: <strong>{session.activePowerup.name}</strong> (noch{" "}
+            {session.activePowerup.roundsRemaining} Runde(n) — +
+            {Math.round(session.activePowerup.damageBonusPct * 100)}% Schaden, -
+            {Math.round(session.activePowerup.incomingReductionPct * 100)}% erlittener Schaden)
+          </p>
+        )}
         <p style={{ fontSize: 13, color: "#777" }}>
-          Kombo: {session.comboCount} (Spezialfähigkeit ab Kombo 2, benötigt Kernmacht oder
+          Kombo: {session.comboCount} (Fähigkeiten ab Kombo 2, benötigt Kernmacht oder
           Spektralritter-Pakt)
         </p>
         <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
@@ -133,11 +141,11 @@ export function CombatPage({
               }}
             >
               <option value="" disabled>
-                Spezialfähigkeit wählen...
+                Fähigkeit wählen...
               </option>
-              {abilityPool.map((name) => (
-                <option key={name} value={name}>
-                  {name}
+              {abilityPool.map((a) => (
+                <option key={a.name} value={a.name}>
+                  {a.kind === "powerup" ? "⚡" : a.kind === "technik" ? "✦" : "⚔"} {a.name}
                 </option>
               ))}
             </select>

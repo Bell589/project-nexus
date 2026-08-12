@@ -6,6 +6,7 @@ import { ValidationError } from "./characterService.js";
 import { getKampfkraft } from "./characterService.js";
 import type { Character } from "../types/character.js";
 import type { Enemy } from "../types/enemy.js";
+import type { Ability } from "../types/ability.js";
 import type { CombatAction, CombatSession } from "../types/combatSession.js";
 
 export function listEnemiesForCharacter(characterId: string): Enemy[] {
@@ -41,6 +42,7 @@ export function startCombat(characterId: string, enemyId: string): CombatSession
     round: 0,
     status: "laufend",
     log: [],
+    activePowerup: null,
     createdAt: new Date().toISOString(),
   };
 
@@ -58,18 +60,10 @@ function randomVariance(base: number): number {
   return base * (0.8 + Math.random() * 0.4); // ±20%
 }
 
-function unlockedAbilityPool(character: Character): { name: string; stageIndex: number }[] {
-  const pool: { name: string; stageIndex: number }[] = [];
-  if (character.corePower) {
-    for (const name of character.corePower.unlockedAbilities) {
-      pool.push({ name, stageIndex: character.corePower.stageIndex });
-    }
-  }
-  if (character.spektralritterPact) {
-    for (const name of character.spektralritterPact.unlockedAbilities) {
-      pool.push({ name, stageIndex: character.spektralritterPact.stageIndex });
-    }
-  }
+function unlockedAbilityPool(character: Character): Ability[] {
+  const pool: Ability[] = [];
+  if (character.corePower) pool.push(...character.corePower.unlockedAbilities);
+  if (character.spektralritterPact) pool.push(...character.spektralritterPact.unlockedAbilities);
   return pool;
 }
 
@@ -89,18 +83,18 @@ export function performAction(
   const enemy = ENEMIES.find((e) => e.id === session.enemyId);
   if (!enemy) throw new ValidationError("Gegner nicht gefunden");
 
-  let usedAbilityStageIndex = 0;
+  let usedAbility: Ability | null = null;
 
   if (action === "spezialfaehigkeit") {
     const pool = unlockedAbilityPool(character);
     if (pool.length === 0) {
       throw new ValidationError(
-        "Spezialfähigkeit erfordert eine erworbene Kernmacht oder einen Spektralritter-Pakt mit freigeschalteten Fähigkeiten"
+        "Erfordert eine erworbene Kernmacht oder einen Spektralritter-Pakt mit freigeschalteten Fähigkeiten"
       );
     }
     if (session.comboCount < 2) {
       throw new ValidationError(
-        `Spezialfähigkeit braucht Kombo 2+ (aktuell ${session.comboCount}). Erst mehrfach angreifen.`
+        `Fähigkeiten brauchen Kombo 2+ (aktuell ${session.comboCount}). Erst mehrfach angreifen.`
       );
     }
     const match = pool.find((p) => p.name === abilityName);
@@ -109,7 +103,7 @@ export function performAction(
         `abilityName muss eine freigeschaltete Fähigkeit sein. Verfügbar: ${pool.map((p) => p.name).join(", ")}`
       );
     }
-    usedAbilityStageIndex = match.stageIndex;
+    usedAbility = match;
   }
 
   const characterPower = getKampfkraft(character);
@@ -120,17 +114,34 @@ export function performAction(
   let damageToCharacter = 0;
   let note = "";
 
-  // Schaden des Charakters
+  // Schaden/Wirkung des Charakters
   if (action === "angriff") {
-    damageToEnemy = randomVariance(characterPower * 0.22);
+    const activeDamageBonus = session.activePowerup ? session.activePowerup.damageBonusPct : 0;
+    damageToEnemy = randomVariance(characterPower * 0.22 * (1 + activeDamageBonus));
     session.comboCount += 1;
-  } else if (action === "spezialfaehigkeit") {
-    const stageBonus = 1 + usedAbilityStageIndex * 0.15; // stärkere Stufen treffen härter
-    damageToEnemy = randomVariance(characterPower * 0.45 * stageBonus);
-    session.comboCount = 0;
-    note = `"${abilityName}" entfesselt! `;
+  } else if (action === "spezialfaehigkeit" && usedAbility) {
+    if (usedAbility.kind === "powerup" && usedAbility.powerup) {
+      // Powerup: kein direkter Schaden, dafür ein Buff - wirkt SOFORT ab dieser Runde
+      session.activePowerup = {
+        name: usedAbility.name,
+        roundsRemaining: usedAbility.powerup.rounds,
+        damageBonusPct: usedAbility.powerup.damageBonusPct,
+        incomingReductionPct: usedAbility.powerup.incomingReductionPct,
+      };
+      damageToEnemy = 0;
+      note = `Powerup aktiviert: "${usedAbility.name}" - ${usedAbility.description}`;
+      session.comboCount = 0;
+    } else {
+      const activeDamageBonus = session.activePowerup ? session.activePowerup.damageBonusPct : 0;
+      // Angriff/Technik-Fähigkeit: verstärkter Schaden, ggf. mit aktivem Powerup-Bonus
+      const stageMultiplier = usedAbility.kind === "angriff" ? 0.5 : 0.35;
+      damageToEnemy = randomVariance(characterPower * stageMultiplier * (1 + activeDamageBonus));
+      note = `"${usedAbility.name}" eingesetzt - ${usedAbility.description}`;
+      session.comboCount = 0;
+    }
   } else if (action === "verteidigung") {
-    damageToEnemy = randomVariance(characterPower * 0.05); // kleiner Konter
+    const activeDamageBonus = session.activePowerup ? session.activePowerup.damageBonusPct : 0;
+    damageToEnemy = randomVariance(characterPower * 0.05 * (1 + activeDamageBonus)); // kleiner Konter
     session.comboCount = 0;
   } else if (action === "flucht") {
     const fleeChance = Math.min(0.9, Math.max(0.1, characterPower / (characterPower + enemyPower)));
@@ -152,7 +163,7 @@ export function performAction(
     session.comboCount = 0;
   }
 
-  // Schaden des Gegners (reduziert falls Charakter sich verteidigt)
+  // Schaden des Gegners (reduziert durch Verteidigung und/oder aktives Powerup)
   let rawEnemyDamage =
     enemyAction === "angriff"
       ? randomVariance(enemyPower * 0.22)
@@ -166,11 +177,21 @@ export function performAction(
   if (action === "flucht") {
     rawEnemyDamage *= 1.5; // Bestrafung für fehlgeschlagene Flucht
   }
+  const activeIncomingReduction = session.activePowerup ? session.activePowerup.incomingReductionPct : 0;
+  rawEnemyDamage *= 1 - Math.min(1, activeIncomingReduction);
   damageToCharacter = rawEnemyDamage;
 
   session.enemyHp = Math.max(0, session.enemyHp - damageToEnemy);
   session.characterHp = Math.max(0, session.characterHp - damageToCharacter);
   session.round += 1;
+
+  // Powerup-Dauer herunterzählen - die Aktivierungsrunde selbst zählt bereits als erste Runde
+  if (session.activePowerup) {
+    session.activePowerup.roundsRemaining -= 1;
+    if (session.activePowerup.roundsRemaining <= 0) {
+      session.activePowerup = null;
+    }
+  }
 
   session.log.push({
     round: session.round,
@@ -178,7 +199,7 @@ export function performAction(
     enemyAction,
     damageToEnemy: Math.round(damageToEnemy),
     damageToCharacter: Math.round(damageToCharacter),
-    abilityUsed: action === "spezialfaehigkeit" ? abilityName ?? null : null,
+    abilityUsed: usedAbility?.name ?? null,
     note: note || "-",
   });
 
@@ -201,4 +222,3 @@ export function getCombatSession(sessionId: string): CombatSession {
   if (!session) throw new ValidationError(`Kampf-Session "${sessionId}" nicht gefunden`);
   return session;
 }
-

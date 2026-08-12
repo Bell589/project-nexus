@@ -1,4 +1,5 @@
 import type { WorldId } from "./world.js";
+import type { Ability } from "./ability.js";
 
 export interface CorePowerArchetype {
   id: string;
@@ -8,5 +9,5 @@ export interface CorePowerArchetype {
   properName: string; // fester, eindeutiger Name, z.B. "Raiun", "Long" - NICHT vom Spieler wählbar
   description: string;
   /** abilitiesByStage[stageIndex] = Fähigkeiten, die beim Erreichen dieser Stufe freigeschaltet werden */
-  abilitiesByStage: string[][];
+  abilitiesByStage: Ability[][];
 }

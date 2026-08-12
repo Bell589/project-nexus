@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../api/client";
+import { AbilityListItem } from "./AbilityListItem";
 import type { Character, CorePowerArchetype, Faction } from "../types/models";
 
 export function CorePowerPanel({
@@ -75,7 +76,7 @@ export function CorePowerPanel({
               <strong>{found.properName}</strong>
               <p style={{ margin: "4px 0", fontSize: 14 }}>{found.description}</p>
               <p style={{ fontSize: 12, color: "#777" }}>
-                Startfähigkeiten: {found.abilitiesByStage[0]?.join(", ")}
+                Startfähigkeiten: {found.abilitiesByStage[0]?.map((a) => a.name).join(", ")}
               </p>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
@@ -106,9 +107,9 @@ export function CorePowerPanel({
         <strong>{currentStageName}</strong>
       </p>
       {character.corePower.unlockedAbilities.length > 0 && (
-        <ul>
+        <ul style={{ listStyle: "none", padding: 0 }}>
           {character.corePower.unlockedAbilities.map((a, i) => (
-            <li key={i}>{a}</li>
+            <AbilityListItem key={i} ability={a} />
           ))}
         </ul>
       )}

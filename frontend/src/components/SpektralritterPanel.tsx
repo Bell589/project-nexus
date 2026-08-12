@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../api/client";
+import { AbilityListItem } from "./AbilityListItem";
 import type { Character, Spektralritter } from "../types/models";
 
 const STAGES = ["Vertrag", "Resonanz", "Rüstung", "Teilverschmelzung", "Vollständige Verschmelzung", "Unbegrenzte Weiterentwicklung"];
@@ -94,9 +95,9 @@ export function SpektralritterPanel({
       <p>
         Stufe {pact.stageIndex + 1}/{STAGES.length}: <strong>{STAGES[pact.stageIndex]}</strong>
       </p>
-      <ul>
+      <ul style={{ listStyle: "none", padding: 0 }}>
         {pact.unlockedAbilities.map((a, i) => (
-          <li key={i}>{a}</li>
+          <AbilityListItem key={i} ability={a} />
         ))}
       </ul>
       {error && <p style={{ color: "crimson" }}>{error}</p>}

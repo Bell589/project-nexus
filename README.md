@@ -30,23 +30,30 @@ project-nexus/
 
 - **3 Welten** mit **6 Fraktionen**, eigene Kernmacht-Pfade.
 - **Kampfkraft-System**: 6 gewichtete Komponenten, per Ausrüstung boostbar.
-- **Kernmacht ist katalogbasiert, komplett ohne Freitext**: Relikte (feste
-  Eigennamen wie "Raiun", "Long"), Zanpakutō/Resurrección/Complete (Soul
-  Society je Fraktion, z.B. "Enraku", "Lobo Sombrío"), Magie (Avalon, z.B.
-  "Raiten", "Chronos-Magie") — jeder Eintrag hat `typeLabel` (Kategorie, z.B.
-  "Tier-Relikt: Drache") und `properName` (fester Name, z.B. "Long"), beide
-  aus dem Katalog, nirgends vom Spieler eingebbar
-  (`backend/src/data/corePowerArchetypes.ts`). Ablauf: Suchen → Binden.
-- **Spektralritter-System** (Avalon): eigener Katalog, unabhängig von der
-  Magie, ebenfalls feste Namen (z.B. "Ritter des Morgengrauens").
-- **Fähigkeiten aktiv im Kampf nutzbar**: bei der Aktion "Spezialfähigkeit"
-  wählt man aus den tatsächlich freigeschalteten, vordefinierten Fähigkeiten
-  (aus Kernmacht und/oder Spektralritter-Pakt) - keine generische Aktion mehr.
-  Schaden skaliert mit der erreichten Stufe der jeweiligen Fähigkeit.
-- **Stärkere Testgegner** pro Welt (Yonko-Kapitän, Flottenadmiral,
-  Captain-Klasse Shinigami, Vasto-Lorde-Anführer, Gefallener Erzmagier,
-  Spektral-Tyrann) mit 300-500 Kampfkraft, um Spezialfähigkeiten wirklich zu
-  fordern.
+- **Fähigkeiten unterscheiden Angriff / Technik / Powerup**, jede mit fester
+  Beschreibung (`backend/src/types/ability.ts`). Powerups wirken nicht als
+  direkter Schaden, sondern als Buff über mehrere Runden (Schadensbonus +
+  reduzierter/immunisierter erlittener Schaden), sofort ab der
+  Aktivierungsrunde.
+- **Tier-Relikte** folgen jetzt fest der Reihenfolge Mensch-Form → Tier-Form
+  (Powerup) → Hybrid-Form (Powerup, Bankai-Äquivalent). **Elementar-Relikte**
+  bekommen bei "Erwachen" ein Powerup (Elementform: 1 Runde unantastbar, ggf.
+  Tempo-Bonus). **Übermenschliche Relikte** (neue dritte Relikt-Kategorie,
+  z.B. "Kalypso", "Aetherion") haben stattdessen einen extrem starken
+  Finisher-Angriff statt einer Verwandlung.
+- **Shinigami-Stufen umbenannt**: "Manifestation" ist jetzt die erste
+  Freisetzungsstufe (Shikai-Äquivalent, Powerup), "Domäne" erst beim vollen
+  Release (Bankai-Äquivalent, Powerup + neue Technik gleichzeitig).
+- **Hollow Resurrección** und **Quincy Complete** sind jetzt selbst Powerups
+  (Transformation) statt reiner Text-Notizen.
+- **Magia Erebea** (Avalon): bei "Meisterschaft" der einzigartigen Magie
+  schaltet sich zusätzlich ein Powerup frei, das den Anwender vollständig in
+  sein Element hüllt, plus eine neue extrem starke Technik.
+- **Spektralritter-Pakt**: "Rüstung" ist jetzt die Kraft-Teilungsstufe
+  (Powerup, Shikai-Äquivalent) + neue Technik, "Vollständige Verschmelzung"
+  das volle Erwachen (Powerup, extrem stark).
+- **6 stärkere Testgegner** (300-500 Kampfkraft) über alle 3 Welten, um
+  Spezialfähigkeiten wirklich zu fordern.
 - **Katalog-Endpunkte** zum Nachschlagen: `GET /api/catalogs/core-power-archetypes?worldId=&factionId=`, `GET /api/catalogs/spektralritter`.
 - **Crew-/Flotten-System** (Ozeanwelt): gründen, beitreten, Rollen vergeben.
 - **Inventar & Ausrüstung**, **Fähigkeiten**, **Missionen**.
@@ -70,15 +77,22 @@ project-nexus/
 
 - Persistente Datenbank (aktuell In-Memory)
 - Authentifizierung / Spieler-Accounts
-- Domänen-Regeln wirken noch nicht mechanisch im Kampfsystem (nur Anzeige)
-- "Finden" ist aktuell ein reiner Zufalls-Pull aus dem Katalog, nicht an
+- Esper (die 9 höchsten Wesen der Spektralwelt) - Pakt-System ist
+  architektonisch vorbereitet (gleiche Mechanik wie Spektralritter, nur
+  stärker), aber noch nicht mit eigenem Katalog umgesetzt
+- Fusion zwischen zwei bereits "erwachten" Magiern (nach Magia Erebea) als
+  eigener, stärkerer Fusionspfad - aktuelle Fusion ist noch stufenunabhängig
+- Die separate Domänen-**Regel**-Auswahl (Teleportation verboten, Heilung
+  deaktiviert, ...) ist weiterhin nur Anzeige, nicht im Kampf verankert. Die
+  Domäne-**Fähigkeit** selbst (Powerup mit Schaden/Schutz-Buff) wirkt jetzt
+  aber mechanisch im Kampf.
+- "Finden" ist ein reiner Zufalls-Pull aus dem Katalog, nicht an
   Standorte auf der Karte gekoppelt
 - Kein Uniqueness-Constraint: mehrere Charaktere können denselben Archetyp
   oder Spektralritter finden/binden
 - Kampf-Sessions gehen bei Backend-Neustart verloren (wie der Rest der
   In-Memory-Daten)
 - Item-Shop/Drops statt manueller `inventory/add`-Testroute
-- Esper (die 9 höchsten Wesen der Spektralwelt) noch nicht implementiert
 
 ## Installation & Start
 

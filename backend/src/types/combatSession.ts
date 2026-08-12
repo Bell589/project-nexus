@@ -11,6 +11,13 @@ export interface CombatRoundLog {
   note: string;
 }
 
+export interface ActivePowerup {
+  name: string;
+  roundsRemaining: number;
+  damageBonusPct: number;
+  incomingReductionPct: number;
+}
+
 export interface CombatSession {
   id: string;
   characterId: string;
@@ -23,5 +30,6 @@ export interface CombatSession {
   round: number;
   status: CombatStatus;
   log: CombatRoundLog[];
+  activePowerup: ActivePowerup | null;
   createdAt: string;
 }

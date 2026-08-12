@@ -37,7 +37,7 @@ export interface Character {
     typeLabel: string;
     archetypeId: string;
     stageIndex: number;
-    unlockedAbilities: string[];
+    unlockedAbilities: Ability[];
   } | null;
   selfAssignedRank: string | null;
   crewId: string | null;
@@ -47,7 +47,7 @@ export interface Character {
   completedMissionIds: string[];
   activeDomainRuleId: string | null;
   fusedInto: string | null;
-  spektralritterPact: { ritterId: string; name: string; stageIndex: number; unlockedAbilities: string[] } | null;
+  spektralritterPact: { ritterId: string; name: string; stageIndex: number; unlockedAbilities: Ability[] } | null;
   createdAt: string;
   kampfkraft?: number;
 }
@@ -59,14 +59,37 @@ export interface CorePowerArchetype {
   typeLabel: string;
   properName: string;
   description: string;
-  abilitiesByStage: string[][];
+  abilitiesByStage: Ability[][];
 }
 
 export interface Spektralritter {
   id: string;
   name: string;
   description: string;
-  abilitiesByStage: string[][];
+  abilitiesByStage: Ability[][];
+}
+
+export type AbilityKind = "angriff" | "technik" | "powerup";
+
+export interface PowerupEffect {
+  rounds: number;
+  damageBonusPct: number;
+  incomingReductionPct: number;
+  speedNote?: string;
+}
+
+export interface Ability {
+  name: string;
+  kind: AbilityKind;
+  description: string;
+  powerup?: PowerupEffect;
+}
+
+export interface ActivePowerup {
+  name: string;
+  roundsRemaining: number;
+  damageBonusPct: number;
+  incomingReductionPct: number;
 }
 
 export type ItemSlot = "waffe" | "ruestung" | "accessoire";
@@ -133,6 +156,7 @@ export interface CombatSession {
   round: number;
   status: CombatStatus;
   log: CombatRoundLog[];
+  activePowerup: ActivePowerup | null;
   createdAt: string;
 }
 

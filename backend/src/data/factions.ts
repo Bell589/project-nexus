@@ -48,7 +48,7 @@ export const FACTIONS: Faction[] = [
     corePowerLabel: "Seelenwaffe",
     corePowerStages: [
       "Versiegelt",
-      "Erweckt",
+      "Manifestation",
       "Resonanz",
       "Domäne",
       "Absolute Manifestation",

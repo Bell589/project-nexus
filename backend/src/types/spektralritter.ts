@@ -1,9 +1,11 @@
+import type { Ability } from "./ability.js";
+
 export interface Spektralritter {
   id: string;
   name: string;
   description: string;
   /** abilitiesByStage[stageIndex] passend zu SPEKTRALRITTER_STAGES */
-  abilitiesByStage: string[][];
+  abilitiesByStage: Ability[][];
 }
 
 export const SPEKTRALRITTER_STAGES = [
