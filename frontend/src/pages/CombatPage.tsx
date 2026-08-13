@@ -23,6 +23,38 @@ function HpBar({ label, hp, maxHp }: { label: string; hp: number; maxHp: number 
   );
 }
 
+function ResourceBar({ label, value, max }: { label: string; value: number; max: number }) {
+  const pct = Math.max(0, Math.min(100, (value / max) * 100));
+  return (
+    <div style={{ marginBottom: 8 }}>
+      <div style={{ fontSize: 13, marginBottom: 2 }}>
+        {label}: {Math.round(value)} / {max}
+      </div>
+      <div style={{ background: "#eee", borderRadius: 4, height: 8, overflow: "hidden" }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: "#66c", transition: "width 0.2s" }} />
+      </div>
+    </div>
+  );
+}
+
+function abilityCost(a: Ability): number {
+  if (a.resourceCost !== undefined) return a.resourceCost;
+  if (a.kind === "powerup") return 30;
+  if (a.kind === "technik") return 20;
+  return 15;
+}
+
+function abilityUsable(a: Ability, session: CombatSession): { usable: boolean; reason?: string } {
+  const cost = abilityCost(a);
+  if (a.requiresActivePowerup && session.activePowerup?.name !== a.requiresActivePowerup) {
+    return { usable: false, reason: `erfordert "${a.requiresActivePowerup}" aktiv` };
+  }
+  if (session.characterResource < cost) {
+    return { usable: false, reason: `zu wenig ${session.resourceLabel} (${cost} nötig)` };
+  }
+  return { usable: true };
+}
+
 const ACTIONS: { id: CombatAction; label: string }[] = [
   { id: "angriff", label: "Angriff" },
   { id: "verteidigung", label: "Verteidigung" },
@@ -113,6 +145,11 @@ export function CombatPage({
         {error && <p style={{ color: "crimson" }}>{error}</p>}
         <HpBar label={character.characterName} hp={session.characterHp} maxHp={session.characterMaxHp} />
         <HpBar label={enemy?.name ?? "Gegner"} hp={session.enemyHp} maxHp={session.enemyMaxHp} />
+        <ResourceBar
+          label={session.resourceLabel}
+          value={session.characterResource}
+          max={session.characterResourceMax}
+        />
         {session.activePowerup && (
           <p style={{ fontSize: 13, background: "#fff3e0", borderRadius: 6, padding: "6px 10px" }}>
             Powerup aktiv: <strong>{session.activePowerup.name}</strong> (noch{" "}
@@ -121,10 +158,6 @@ export function CombatPage({
             {Math.round(session.activePowerup.incomingReductionPct * 100)}% erlittener Schaden)
           </p>
         )}
-        <p style={{ fontSize: 13, color: "#777" }}>
-          Kombo: {session.comboCount} (Fähigkeiten ab Kombo 2, benötigt Kernmacht oder
-          Spektralritter-Pakt)
-        </p>
         <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
           {ACTIONS.filter((a) => a.id !== "spezialfaehigkeit").map((a) => (
             <button key={a.id} disabled={busy} onClick={() => act(a.id)}>
@@ -143,11 +176,16 @@ export function CombatPage({
               <option value="" disabled>
                 Fähigkeit wählen...
               </option>
-              {abilityPool.map((a) => (
-                <option key={a.name} value={a.name}>
-                  {a.kind === "powerup" ? "⚡" : a.kind === "technik" ? "✦" : "⚔"} {a.name}
-                </option>
-              ))}
+              {abilityPool.map((a) => {
+                const { usable, reason } = abilityUsable(a, session);
+                const kindIcon = a.kind === "powerup" ? "⚡" : a.kind === "technik" ? "✦" : "⚔";
+                return (
+                  <option key={a.name} value={a.name} disabled={!usable}>
+                    {kindIcon} {a.name} ({abilityCost(a)} {session.resourceLabel})
+                    {!usable ? ` — ${reason}` : ""}
+                  </option>
+                );
+              })}
             </select>
           )}
         </div>

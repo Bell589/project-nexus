@@ -8,6 +8,7 @@ import type { Character } from "../types/character.js";
 import type { Enemy } from "../types/enemy.js";
 import type { Ability } from "../types/ability.js";
 import type { CombatAction, CombatSession } from "../types/combatSession.js";
+import type { WorldId } from "../types/world.js";
 
 export function listEnemiesForCharacter(characterId: string): Enemy[] {
   const character = CharacterStore.get(characterId);
@@ -16,6 +17,21 @@ export function listEnemiesForCharacter(characterId: string): Enemy[] {
 }
 
 const HP_PER_KAMPFKRAFT = 3;
+const RESOURCE_PER_KAMPFKRAFT = 0.4;
+const RESOURCE_BASE = 20;
+
+const RESOURCE_LABELS: Record<WorldId, string> = {
+  ozeanwelt: "Wille",
+  soul_society: "Reiatsu",
+  avalon: "Mana",
+};
+
+function abilityResourceCost(ability: Ability): number {
+  if (ability.resourceCost !== undefined) return ability.resourceCost;
+  if (ability.kind === "powerup") return 30;
+  if (ability.kind === "technik") return 20;
+  return 15; // angriff-Fähigkeiten aus dem Katalog (nicht die Basis-Aktion "Angriff")
+}
 
 export function startCombat(characterId: string, enemyId: string): CombatSession {
   const character = CharacterStore.get(characterId);
@@ -27,8 +43,10 @@ export function startCombat(characterId: string, enemyId: string): CombatSession
     throw new ValidationError("Gegner gehört nicht zur Welt des Charakters");
   }
 
-  const characterMaxHp = Math.round(getKampfkraft(character) * HP_PER_KAMPFKRAFT) + 30;
+  const kampfkraft = getKampfkraft(character);
+  const characterMaxHp = Math.round(kampfkraft * HP_PER_KAMPFKRAFT) + 30;
   const enemyMaxHp = Math.round(enemy.kampfkraft * HP_PER_KAMPFKRAFT) + 30;
+  const characterResourceMax = Math.round(kampfkraft * RESOURCE_PER_KAMPFKRAFT) + RESOURCE_BASE;
 
   const session: CombatSession = {
     id: nanoid(),
@@ -38,7 +56,9 @@ export function startCombat(characterId: string, enemyId: string): CombatSession
     characterMaxHp,
     enemyHp: enemyMaxHp,
     enemyMaxHp,
-    comboCount: 0,
+    resourceLabel: RESOURCE_LABELS[character.worldId],
+    characterResource: characterResourceMax,
+    characterResourceMax,
     round: 0,
     status: "laufend",
     log: [],
@@ -92,17 +112,24 @@ export function performAction(
         "Erfordert eine erworbene Kernmacht oder einen Spektralritter-Pakt mit freigeschalteten Fähigkeiten"
       );
     }
-    if (session.comboCount < 2) {
-      throw new ValidationError(
-        `Fähigkeiten brauchen Kombo 2+ (aktuell ${session.comboCount}). Erst mehrfach angreifen.`
-      );
-    }
     const match = pool.find((p) => p.name === abilityName);
     if (!match) {
       throw new ValidationError(
         `abilityName muss eine freigeschaltete Fähigkeit sein. Verfügbar: ${pool.map((p) => p.name).join(", ")}`
       );
     }
+    if (match.requiresActivePowerup && session.activePowerup?.name !== match.requiresActivePowerup) {
+      throw new ValidationError(
+        `"${match.name}" erfordert die aktive Verwandlung/Domäne "${match.requiresActivePowerup}".`
+      );
+    }
+    const cost = abilityResourceCost(match);
+    if (session.characterResource < cost) {
+      throw new ValidationError(
+        `Nicht genug ${session.resourceLabel} (${session.characterResource}/${cost} benötigt).`
+      );
+    }
+    session.characterResource -= cost;
     usedAbility = match;
   }
 
@@ -118,7 +145,6 @@ export function performAction(
   if (action === "angriff") {
     const activeDamageBonus = session.activePowerup ? session.activePowerup.damageBonusPct : 0;
     damageToEnemy = randomVariance(characterPower * 0.22 * (1 + activeDamageBonus));
-    session.comboCount += 1;
   } else if (action === "spezialfaehigkeit" && usedAbility) {
     if (usedAbility.kind === "powerup" && usedAbility.powerup) {
       // Powerup: kein direkter Schaden, dafür ein Buff - wirkt SOFORT ab dieser Runde
@@ -128,21 +154,23 @@ export function performAction(
         damageBonusPct: usedAbility.powerup.damageBonusPct,
         incomingReductionPct: usedAbility.powerup.incomingReductionPct,
       };
+      if (usedAbility.powerup.hpBonusFlat) {
+        session.characterHp = Math.min(
+          session.characterMaxHp,
+          session.characterHp + usedAbility.powerup.hpBonusFlat
+        );
+      }
       damageToEnemy = 0;
       note = `Powerup aktiviert: "${usedAbility.name}" - ${usedAbility.description}`;
-      session.comboCount = 0;
     } else {
       const activeDamageBonus = session.activePowerup ? session.activePowerup.damageBonusPct : 0;
-      // Angriff/Technik-Fähigkeit: verstärkter Schaden, ggf. mit aktivem Powerup-Bonus
       const stageMultiplier = usedAbility.kind === "angriff" ? 0.5 : 0.35;
       damageToEnemy = randomVariance(characterPower * stageMultiplier * (1 + activeDamageBonus));
       note = `"${usedAbility.name}" eingesetzt - ${usedAbility.description}`;
-      session.comboCount = 0;
     }
   } else if (action === "verteidigung") {
     const activeDamageBonus = session.activePowerup ? session.activePowerup.damageBonusPct : 0;
     damageToEnemy = randomVariance(characterPower * 0.05 * (1 + activeDamageBonus)); // kleiner Konter
-    session.comboCount = 0;
   } else if (action === "flucht") {
     const fleeChance = Math.min(0.9, Math.max(0.1, characterPower / (characterPower + enemyPower)));
     if (Math.random() < fleeChance) {
@@ -160,7 +188,6 @@ export function performAction(
       return CombatSessionStore.save(session);
     }
     note = "Flucht fehlgeschlagen! ";
-    session.comboCount = 0;
   }
 
   // Schaden des Gegners (reduziert durch Verteidigung und/oder aktives Powerup)

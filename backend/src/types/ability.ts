@@ -9,6 +9,8 @@ export interface PowerupEffect {
   incomingReductionPct: number;
   /** Optionaler Flavor-Hinweis, z.B. "+Tempo-Vorteil" */
   speedNote?: string;
+  /** Einmaliger Leben-Bonus bei Aktivierung (z.B. "mehr Leben" bei Verwandlung) */
+  hpBonusFlat?: number;
 }
 
 export interface Ability {
@@ -17,4 +19,8 @@ export interface Ability {
   description: string;
   /** Nur gesetzt wenn kind === "powerup" */
   powerup?: PowerupEffect;
+  /** Kostet Ressource (Wille/Reiatsu/Mana je Welt) bei Einsatz im Kampf */
+  resourceCost?: number;
+  /** Nur einsetzbar, während dieser Powerup-Name aktiv ist (z.B. Domänen-Techniken) */
+  requiresActivePowerup?: string;
 }

@@ -8,7 +8,7 @@ export const FACTIONS: Faction[] = [
     name: "Piraten",
     description: "Freie Crews ohne NPCs. Gründer wird Captain, Crew organisiert sich selbst.",
     playerAssignedRanks: ["Captain", "Erster Offizier", "Kommandant"],
-    baseSkills: ["Wille", "Waffenkampf", "Seefahrt", "Schiffssystem"],
+    baseSkills: ["Wahrnehmung (Kenbunshoku)", "Verstärkung (Busoshoku)", "Dominanz (Haoshoku)", "Waffenkampf", "Seefahrt", "Schiffssystem"],
     corePowerLabel: "Relikt",
     corePowerStages: [
       "Relikt",
@@ -25,7 +25,7 @@ export const FACTIONS: Faction[] = [
     name: "Marine",
     description: "Weltregierung (anfangs Administrator-geführt) mit Fünf Weisen, Marine, CP.",
     playerAssignedRanks: ["Admiral", "Flottenadmiral", "Oberkommandant"],
-    baseSkills: ["Wille", "Waffenkampf", "Seefahrt", "Schiffssystem"],
+    baseSkills: ["Wahrnehmung (Kenbunshoku)", "Verstärkung (Busoshoku)", "Dominanz (Haoshoku)", "Waffenkampf", "Seefahrt", "Schiffssystem"],
     corePowerLabel: "Relikt",
     corePowerStages: [
       "Relikt",
@@ -51,7 +51,7 @@ export const FACTIONS: Faction[] = [
       "Manifestation",
       "Resonanz",
       "Domäne",
-      "Absolute Manifestation",
+      "Domänen-Meisterschaft",
       "Unbegrenzte Weiterentwicklung",
     ],
   },

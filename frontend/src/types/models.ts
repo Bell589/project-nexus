@@ -83,6 +83,8 @@ export interface Ability {
   kind: AbilityKind;
   description: string;
   powerup?: PowerupEffect;
+  resourceCost?: number;
+  requiresActivePowerup?: string;
 }
 
 export interface ActivePowerup {
@@ -152,7 +154,9 @@ export interface CombatSession {
   characterMaxHp: number;
   enemyHp: number;
   enemyMaxHp: number;
-  comboCount: number;
+  resourceLabel: string;
+  characterResource: number;
+  characterResourceMax: number;
   round: number;
   status: CombatStatus;
   log: CombatRoundLog[];

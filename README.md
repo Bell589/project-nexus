@@ -30,30 +30,26 @@ project-nexus/
 
 - **3 Welten** mit **6 Fraktionen**, eigene Kernmacht-Pfade.
 - **Kampfkraft-System**: 6 gewichtete Komponenten, per Ausrüstung boostbar.
-- **Fähigkeiten unterscheiden Angriff / Technik / Powerup**, jede mit fester
-  Beschreibung (`backend/src/types/ability.ts`). Powerups wirken nicht als
-  direkter Schaden, sondern als Buff über mehrere Runden (Schadensbonus +
-  reduzierter/immunisierter erlittener Schaden), sofort ab der
-  Aktivierungsrunde.
-- **Tier-Relikte** folgen jetzt fest der Reihenfolge Mensch-Form → Tier-Form
-  (Powerup) → Hybrid-Form (Powerup, Bankai-Äquivalent). **Elementar-Relikte**
-  bekommen bei "Erwachen" ein Powerup (Elementform: 1 Runde unantastbar, ggf.
-  Tempo-Bonus). **Übermenschliche Relikte** (neue dritte Relikt-Kategorie,
-  z.B. "Kalypso", "Aetherion") haben stattdessen einen extrem starken
-  Finisher-Angriff statt einer Verwandlung.
-- **Shinigami-Stufen umbenannt**: "Manifestation" ist jetzt die erste
-  Freisetzungsstufe (Shikai-Äquivalent, Powerup), "Domäne" erst beim vollen
-  Release (Bankai-Äquivalent, Powerup + neue Technik gleichzeitig).
-- **Hollow Resurrección** und **Quincy Complete** sind jetzt selbst Powerups
-  (Transformation) statt reiner Text-Notizen.
-- **Magia Erebea** (Avalon): bei "Meisterschaft" der einzigartigen Magie
-  schaltet sich zusätzlich ein Powerup frei, das den Anwender vollständig in
-  sein Element hüllt, plus eine neue extrem starke Technik.
-- **Spektralritter-Pakt**: "Rüstung" ist jetzt die Kraft-Teilungsstufe
-  (Powerup, Shikai-Äquivalent) + neue Technik, "Vollständige Verschmelzung"
-  das volle Erwachen (Powerup, extrem stark).
-- **6 stärkere Testgegner** (300-500 Kampfkraft) über alle 3 Welten, um
-  Spezialfähigkeiten wirklich zu fordern.
+- **Kein Kombo-System mehr**: Fähigkeiten kosten stattdessen eine
+  Welt-spezifische Ressource - **Wille** (Ozeanwelt), **Reiatsu** (Soul
+  Society), **Mana** (Avalon). Pool wird pro Kampf aus der Kampfkraft
+  berechnet, Kosten skalieren nach Fähigkeits-Art (Powerup 30, Technik 20,
+  Angriff-Fähigkeit 15). Die Basis-Aktion "Angriff" bleibt kostenlos.
+- **Verwandlungs-Powerups wirken jetzt dauerhaft (3-4 Runden) statt nur 1-2**,
+  heilen beim Aktivieren etwas Leben und schalten neue, sonst gesperrte
+  Techniken frei (`requiresActivePowerup`) - z.B. "Entladungssturm" nur in
+  Elementform, "Drachenzorn" nur in Hybrid-Form.
+- **Shinigami-Domäne ist jetzt eindeutig die höchste Stufe**: nach der Domäne
+  kommen nur noch weitere, an die Domäne gebundene Techniken (Domänen-Finisher,
+  Domänen-Technik), keine dritte Freisetzung mehr. Stufenname entsprechend
+  von "Absolute Manifestation" zu "Domänen-Meisterschaft" geändert.
+- **Übermenschliche Relikte** wirken jetzt explizit auch auf anorganische
+  Gegenstände (neue Technik "Objektbindung"/"Materiefesseln").
+- **Elementar-Relikte** können leicht das Wetter beeinflussen (neue Technik
+  "Gewitterwolke"/"Hitzewelle") für einen taktischen Vorteil.
+- **3 Haki-Formen (Wille) als lernbare Fraktions-Fähigkeiten**: Wahrnehmung
+  (Kenbunshoku), Verstärkung (Busoshoku), Dominanz (Haoshoku) - ersetzen den
+  bisherigen generischen "Wille"-Skill bei Piraten/Marine.
 - **Katalog-Endpunkte** zum Nachschlagen: `GET /api/catalogs/core-power-archetypes?worldId=&factionId=`, `GET /api/catalogs/spektralritter`.
 - **Crew-/Flotten-System** (Ozeanwelt): gründen, beitreten, Rollen vergeben.
 - **Inventar & Ausrüstung**, **Fähigkeiten**, **Missionen**.

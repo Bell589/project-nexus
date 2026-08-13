@@ -26,7 +26,9 @@ export interface CombatSession {
   characterMaxHp: number;
   enemyHp: number;
   enemyMaxHp: number;
-  comboCount: number;
+  resourceLabel: string; // "Wille" | "Reiatsu" | "Mana" je nach Welt
+  characterResource: number;
+  characterResourceMax: number;
   round: number;
   status: CombatStatus;
   log: CombatRoundLog[];

@@ -33,7 +33,7 @@ export const SPEKTRALRITTER: Spektralritter[] = [
         powerup(
           "Kraft-Teilung: Morgengrauen-Rüstung",
           "Der Magier teilt sich die Kraft des Ritters - eine erste Stufe der Verschmelzung, vergleichbar mit einem ersten Release.",
-          2,
+          3,
           0.3,
           0.25
         ),
@@ -64,7 +64,7 @@ export const SPEKTRALRITTER: Spektralritter[] = [
         powerup(
           "Kraft-Teilung: Stille-Rüstung",
           "Der Magier teilt sich die Kraft des Ritters - eine erste Stufe der Verschmelzung.",
-          2,
+          3,
           0.25,
           0.35
         ),
@@ -94,7 +94,7 @@ export const SPEKTRALRITTER: Spektralritter[] = [
         powerup(
           "Kraft-Teilung: Eiserne Rüstung",
           "Der Magier teilt sich die Kraft des Ritters - eine erste Stufe der Verschmelzung.",
-          2,
+          3,
           0.2,
           0.45
         ),
