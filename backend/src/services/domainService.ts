@@ -14,10 +14,10 @@ export function selectDomainRule(characterId: string, ruleId: string): Character
   const faction = FACTIONS.find((f) => f.id === "shinigami")!;
   const domaenStageIndex = faction.corePowerStages.indexOf("Domäne");
 
-  if (!character.corePower || character.corePower.stageIndex < domaenStageIndex) {
+  if (!character.uniquePower || character.uniquePower.stageIndex < domaenStageIndex) {
     throw new ValidationError(
       `Seelenwaffe muss erst die Stufe "Domäne" erreichen (aktuell: ${
-        character.corePower ? faction.corePowerStages[character.corePower.stageIndex] : "keine Kernmacht"
+        character.uniquePower ? faction.corePowerStages[character.uniquePower.stageIndex] : "keine Unique Power"
       })`
     );
   }

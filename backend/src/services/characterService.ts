@@ -46,7 +46,7 @@ export function createCharacter(input: CreateCharacterInput): Character {
       erfolge: 0,
       training: 0,
     },
-    corePower: null, // wird erst freigeschaltet, sobald genug Kampfkraft erreicht ist
+    uniquePower: null, // wird erst freigeschaltet, sobald genug Kampfkraft erreicht ist
     selfAssignedRank: null,
     crewId: null,
     inventory: [],

@@ -6,7 +6,7 @@ import {
   listCharacters,
   ValidationError,
 } from "../services/characterService.js";
-import { acquireCorePower, advanceCorePowerStage, searchForCorePower } from "../services/corePowerService.js";
+import { acquireUniquePower, advanceUniquePowerStage, searchForUniquePower } from "../services/corePowerService.js";
 import { trainComponent } from "../services/trainingService.js";
 import { addItem, equipItem, unequipItem, useConsumable } from "../services/inventoryService.js";
 import { trainSkill } from "../services/skillService.js";
@@ -61,7 +61,7 @@ charactersRouter.post("/:id/train", (req, res) => {
 
 charactersRouter.post("/:id/core-power/search", (req, res) => {
   try {
-    res.json(searchForCorePower(req.params.id));
+    res.json(searchForUniquePower(req.params.id));
   } catch (err) {
     if (err instanceof ValidationError) {
       res.status(400).json({ error: err.message });
@@ -73,8 +73,7 @@ charactersRouter.post("/:id/core-power/search", (req, res) => {
 
 charactersRouter.post("/:id/core-power/acquire", (req, res) => {
   try {
-    const { archetypeId } = req.body;
-    const character = acquireCorePower(req.params.id, archetypeId);
+    const character = acquireUniquePower(req.params.id, req.body);
     res.json({ ...character, kampfkraft: getKampfkraft(character) });
   } catch (err) {
     if (err instanceof ValidationError) {
@@ -87,7 +86,7 @@ charactersRouter.post("/:id/core-power/acquire", (req, res) => {
 
 charactersRouter.post("/:id/core-power/advance", (req, res) => {
   try {
-    const character = advanceCorePowerStage(req.params.id);
+    const character = advanceUniquePowerStage(req.params.id);
     res.json({ ...character, kampfkraft: getKampfkraft(character) });
   } catch (err) {
     if (err instanceof ValidationError) {

@@ -11,7 +11,7 @@ import type {
   CombatSession,
   CombatAction,
   DomainRule,
-  CorePowerArchetype,
+  UniquePowerInstance,
   Spektralritter,
 } from "../types/models";
 
@@ -50,14 +50,14 @@ export const api = {
     }),
 
   searchCorePower: (characterId: string) =>
-    request<CorePowerArchetype>(`/characters/${characterId}/core-power/search`, {
+    request<UniquePowerInstance>(`/characters/${characterId}/core-power/search`, {
       method: "POST",
     }),
 
-  acquireCorePower: (characterId: string, archetypeId: string) =>
+  acquireCorePower: (characterId: string, found: UniquePowerInstance) =>
     request<Character>(`/characters/${characterId}/core-power/acquire`, {
       method: "POST",
-      body: JSON.stringify({ archetypeId }),
+      body: JSON.stringify(found),
     }),
 
   advanceCorePower: (characterId: string) =>

@@ -32,12 +32,14 @@ export interface Character {
     erfolge: number;
     training: number;
   };
-  corePower: {
-    name: string;
-    typeLabel: string;
-    archetypeId: string;
+  uniquePower: {
+    originId: string;
+    category: string;
+    variant: string;
+    generatedName: string;
     stageIndex: number;
-    unlockedAbilities: Ability[];
+    individualAbilities: Ability[];
+    developmentLog: string[];
   } | null;
   selfAssignedRank: string | null;
   crewId: string | null;
@@ -52,14 +54,27 @@ export interface Character {
   kampfkraft?: number;
 }
 
-export interface CorePowerArchetype {
+export interface UniquePowerInstance {
+  originId: string;
+  category: string;
+  variant: string;
+  generatedName: string;
+  stageIndex: number;
+  individualAbilities: Ability[];
+  developmentLog: string[];
+}
+
+export interface UniquePowerOrigin {
   id: string;
   worldId: WorldId;
   factionIds: string[];
-  typeLabel: string;
-  properName: string;
+  category: string;
+  variantPool: string[];
+  namePrefixPool: string[];
+  nameSuffixPool: string[];
   description: string;
-  abilitiesByStage: Ability[][];
+  stageDefinitions: { name: string; tier: string; abilityCount: number; isPowerupStage: boolean }[];
+  abilityPool: (Ability & { tier: string; variant?: string })[];
 }
 
 export interface Spektralritter {

@@ -82,7 +82,7 @@ function randomVariance(base: number): number {
 
 function unlockedAbilityPool(character: Character): Ability[] {
   const pool: Ability[] = [];
-  if (character.corePower) pool.push(...character.corePower.unlockedAbilities);
+  if (character.uniquePower) pool.push(...character.uniquePower.individualAbilities);
   if (character.spektralritterPact) pool.push(...character.spektralritterPact.unlockedAbilities);
   return pool;
 }

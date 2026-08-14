@@ -1,19 +1,13 @@
 import type { WorldId } from "./world.js";
 import type { KampfkraftComponents } from "./kampfkraft.js";
 import type { Ability } from "./ability.js";
+import type { UniquePowerInstance } from "./uniquePower.js";
 
 /**
- * Konkrete Instanz der Kernmacht eines Charakters (Relikt, Seelenwaffe,
- * Resurrección, Complete, einzigartige Magie, Spektralritter, Esper...).
- * stageIndex zeigt auf world.corePowerStages[stageIndex].
+ * DEPRECATED - abgelöst durch UniquePowerInstance (individuell generiert
+ * statt Fixliste, siehe ANALYSE_UND_UMBAUPLAN.md Abschnitt 3.1). Bleibt hier
+ * nur als Kommentar-Hinweis für spätere Leser, wird nicht mehr verwendet.
  */
-export interface CorePower {
-  name: string; // fester Eigenname aus dem Katalog, z.B. "Raiun" - NICHT vom Spieler wählbar
-  typeLabel: string; // Kategorie, z.B. "Elementar-Relikt: Blitz"
-  archetypeId: string; // Referenz auf CorePowerArchetype.id
-  stageIndex: number;
-  unlockedAbilities: Ability[];
-}
 
 export interface SpektralritterPact {
   ritterId: string;
@@ -45,7 +39,7 @@ export interface Character {
   worldId: WorldId;
   factionId: string;
   kampfkraftComponents: KampfkraftComponents;
-  corePower: CorePower | null; // null bis Charakter die Kernmacht erhalten/gefunden hat
+  uniquePower: UniquePowerInstance | null; // individuell generiert, siehe uniquePowerGenerationService
   selfAssignedRank: string | null; // z.B. "Captain" - von Spielern vergeben, nicht vom System
   crewId: string | null; // nur relevant in der Ozeanwelt
   inventory: InventorySlot[];

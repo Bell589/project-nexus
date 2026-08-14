@@ -136,7 +136,7 @@ export function CombatPage({
   if (session) {
     const enemy = enemies.find((e) => e.id === session.enemyId);
     const abilityPool: Ability[] = [
-      ...(character.corePower?.unlockedAbilities ?? []),
+      ...(character.uniquePower?.individualAbilities ?? []),
       ...(character.spektralritterPact?.unlockedAbilities ?? []),
     ];
     return (

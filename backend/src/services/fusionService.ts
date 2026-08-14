@@ -53,16 +53,22 @@ export function fuseCharacters(
     worldId: "avalon",
     factionId: "magier",
     kampfkraftComponents: combinedComponents,
-    corePower:
-      a.corePower && b.corePower
+    uniquePower:
+      a.uniquePower && b.uniquePower
         ? {
-            archetypeId: a.corePower.archetypeId,
-            typeLabel: `Fusion: ${a.corePower.typeLabel} + ${b.corePower.typeLabel}`,
-            name: `${a.corePower.name} / ${b.corePower.name}`,
-            stageIndex: Math.max(a.corePower.stageIndex, b.corePower.stageIndex),
-            unlockedAbilities: [...a.corePower.unlockedAbilities, ...b.corePower.unlockedAbilities],
+            originId: a.uniquePower.originId,
+            category: `Fusion: ${a.uniquePower.category} + ${b.uniquePower.category}`,
+            variant: `${a.uniquePower.variant} / ${b.uniquePower.variant}`,
+            generatedName: `${a.uniquePower.generatedName} / ${b.uniquePower.generatedName}`,
+            stageIndex: Math.max(a.uniquePower.stageIndex, b.uniquePower.stageIndex),
+            individualAbilities: [...a.uniquePower.individualAbilities, ...b.uniquePower.individualAbilities],
+            developmentLog: [
+              ...a.uniquePower.developmentLog,
+              ...b.uniquePower.developmentLog,
+              `Fusion von ${a.characterName} und ${b.characterName} zu ${newCharacterName.trim()}`,
+            ],
           }
-        : a.corePower ?? b.corePower,
+        : a.uniquePower ?? b.uniquePower,
     selfAssignedRank: null,
     crewId: null,
     inventory: [...a.inventory, ...b.inventory],
