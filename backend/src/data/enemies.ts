@@ -1,0 +1,91 @@
+import type { Enemy } from "../types/enemy.js";
+
+export const ENEMIES: Enemy[] = [
+  { id:"ninja-bandit", worldId:"ninja_welt", name:"Wegelagerer", description:"Ein früher Gegner für frisch ausgebildete Ninja.", kampfkraft:12, rewardComponents:{erfahrung:8} },
+  { id:"ninja-rogue", worldId:"ninja_welt", name:"Abtrünniger Genin", description:"Ein gefährlicherer junger Abtrünniger.", kampfkraft:35, rewardComponents:{erfahrung:18,training:5} },
+  { id:"hollow-streuner", worldId:"soul_society", name:"Streunender Hollow", description:"Eine frühe Bedrohung in den Seelenbezirken.", kampfkraft:14, rewardComponents:{erfahrung:9} },
+  { id:"wuestenraeuber", worldId:"avalon", name:"Wüstenräuber", description:"Ein gewöhnlicher Gegner auf den Wegen Avalons.", kampfkraft:13, rewardComponents:{erfahrung:8} },
+
+  {
+    id: "kleiner-pirat",
+    worldId: "ozeanwelt",
+    name: "Streunender Pirat",
+    description: "Schwacher Gegner, gut zum Einstieg.",
+    kampfkraft: 15,
+    rewardComponents: { erfahrung: 10 },
+  },
+  {
+    id: "weltboss-krake",
+    worldId: "ozeanwelt",
+    name: "Weltboss: Tiefsee-Krake",
+    description: "Mächtiger Weltboss der Ozeanwelt.",
+    kampfkraft: 150,
+    rewardComponents: { erfahrung: 60, erfolge: 30 },
+  },
+  {
+    id: "gillian-hollow",
+    worldId: "soul_society",
+    name: "Gillian",
+    description: "Verschmolzene Hollow-Masse, mittlere Bedrohung.",
+    kampfkraft: 45,
+    rewardComponents: { erfahrung: 20, faehigkeiten: 10 },
+  },
+  {
+    id: "korrumpierter-ritter",
+    worldId: "avalon",
+    name: "Korrumpierter Spektralritter",
+    description: "Einst edler Ritter, nun von dunkler Magie verzerrt.",
+    kampfkraft: 80,
+    rewardComponents: { erfahrung: 30, systemBeherrschung: 20 },
+  },
+
+  // --- Stärkere Gegner zum Testen von Spezialfähigkeiten ---
+  {
+    id: "yonko-kapitaen",
+    worldId: "ozeanwelt",
+    name: "Yonko-Kapitän",
+    description: "Einer der mächtigsten Piraten überhaupt. Nur mit ausgereifter Kernmacht zu bezwingen.",
+    kampfkraft: 300,
+    rewardComponents: { erfahrung: 80, erfolge: 40, ausruestung: 20 },
+  },
+  {
+    id: "flottenadmiral",
+    worldId: "ozeanwelt",
+    name: "Flottenadmiral",
+    description: "Höchster Rang der Marine, verkörpert die volle Staatsgewalt.",
+    kampfkraft: 350,
+    rewardComponents: { erfahrung: 90, erfolge: 50 },
+  },
+  {
+    id: "captain-klasse-shinigami",
+    worldId: "soul_society",
+    name: "Captain-Klasse Shinigami",
+    description: "Ein Divisionsleiter mit erwachter Seelenwaffe.",
+    kampfkraft: 320,
+    rewardComponents: { erfahrung: 85, faehigkeiten: 30, systemBeherrschung: 20 },
+  },
+  {
+    id: "vasto-lorde-anfuehrer",
+    worldId: "soul_society",
+    name: "Vasto-Lorde-Anführer",
+    description: "Ein Hollow auf höchster Evolutionsstufe, kurz vor der Resurrección.",
+    kampfkraft: 340,
+    rewardComponents: { erfahrung: 90, faehigkeiten: 25 },
+  },
+  {
+    id: "gefallener-erzmagier",
+    worldId: "avalon",
+    name: "Gefallener Erzmagier",
+    description: "Ein Magier, der Magia Erebea zu weit trieb und den Verstand verlor.",
+    kampfkraft: 330,
+    rewardComponents: { erfahrung: 85, systemBeherrschung: 40 },
+  },
+  {
+    id: "spektral-tyrann",
+    worldId: "avalon",
+    name: "Spektral-Tyrann",
+    description: "Eine entfesselte Entität aus der Spektralwelt. Höchste Bedrohungsstufe.",
+    kampfkraft: 500,
+    rewardComponents: { erfahrung: 120, systemBeherrschung: 60, erfolge: 40 },
+  },
+];

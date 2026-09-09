@@ -1,0 +1,24 @@
+import type { WorldId } from "./world.js";
+
+export type LocationType =
+  | "insel"
+  | "hauptquartier"
+  | "seelenbezirk"
+  | "ort_der_macht"
+  | "arkaner_knoten"
+  | "dungeon"
+  | "dorf"
+  | "bijuu_sichtung"
+  | "otsutsuki_sichtung"
+  | "spektralwelt_ort";
+
+export interface Location {
+  id: string;
+  worldId: WorldId;
+  name: string;
+  type: LocationType;
+  description: string;
+  /** Position auf der Karte in Prozent (0-100), fürs Frontend-SVG */
+  x: number;
+  y: number;
+}

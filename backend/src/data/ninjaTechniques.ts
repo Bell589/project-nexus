@@ -1,0 +1,15 @@
+import type { NinjaTechniqueDefinition } from "../types/ninjaTechnique.js";
+export const NINJA_TECHNIQUES:NinjaTechniqueDefinition[]=[
+ {id:"bunshin",name:"Bunshin no Jutsu",description:"Erzeugt einfache Doppelgänger und erschwert das Lesen deiner Bewegung.",category:"grundjutsu",acquisitionMethod:"ACADEMY",baseCost:8,effect:"dodge",copyable:true,trainable:true},
+ {id:"kawarimi",name:"Kawarimi no Jutsu",description:"Bereitet einen Austausch vor und erhöht die Chance, dem nächsten Angriff zu entgehen.",category:"grundjutsu",acquisitionMethod:"ACADEMY",baseCost:10,effect:"dodge",copyable:true,trainable:true},
+ {id:"henge",name:"Henge no Jutsu",description:"Grundlegende Verwandlungstechnik; im Kampf als Täuschungsmanöver nutzbar.",category:"grundjutsu",acquisitionMethod:"ACADEMY",baseCost:6,effect:"utility",copyable:true,trainable:true},
+ {id:"shurikenjutsu",name:"Shurikenjutsu",description:"Präziser Fernkampfangriff mit Wurfwaffen.",category:"taijutsu",acquisitionMethod:"TRAINING",baseCost:4,damage:18,effect:"damage",copyable:true,trainable:true},
+ {id:"goukakyuu",name:"Katon: Gōkakyū no Jutsu",description:"Großer Feuerball; klassisches Uchiha-Katontraining.",category:"katon",element:"Katon",clanRestriction:["clan-uchiha"],acquisitionMethod:"CLAN_TRAINING",baseCost:18,damage:38,effect:"damage",copyable:true,trainable:true},
+ {id:"housenka",name:"Katon: Hōsenka",description:"Mehrere kleinere Feuerprojektile erschweren das Ausweichen.",category:"katon",element:"Katon",clanRestriction:["clan-uchiha"],acquisitionMethod:"CLAN_TRAINING",baseCost:22,damage:44,effect:"damage",copyable:true,trainable:true,requiredMastery:25},
+ {id:"genjutsu-kasumi",name:"Kasumi-Genjutsu",description:"Eine einfache Illusion senkt die gegnerische Trefferwahrscheinlichkeit.",category:"genjutsu",acquisitionMethod:"TRAINING",baseCost:16,effect:"genjutsu",copyable:true,trainable:true},
+ {id:"rasengan",name:"Rasengan",description:"Hochverdichtete rotierende Chakrakugel; nur über einen entdeckten Meister lernbar.",category:"meister",acquisitionMethod:"MASTER_TRAINING",baseCost:28,damage:60,effect:"damage",copyable:true,trainable:true,hidden:true},
+ {id:"chidori",name:"Chidori",description:"Extrem schneller Raiton-Durchstoß mit hoher Präzisionsanforderung.",category:"raiton",element:"Raiton",acquisitionMethod:"MASTER_TRAINING",baseCost:30,damage:66,effect:"damage",copyable:true,trainable:true,hidden:true},
+ {id:"sharingan-genjutsu",name:"Sharingan: Genjutsu",description:"Augenkontakt-basierte Illusion; nur mit aktivem Sharingan.",category:"dojutsu",clanRestriction:["clan-uchiha"],acquisitionMethod:"PROGRESSION",baseCost:20,effect:"genjutsu",copyable:false,trainable:true,requiredDojutsuStage:1,requiredStateId:"sharingan"},
+ {id:"amaterasu",name:"Amaterasu",description:"Schwarze Flammen verursachen anhaltenden Schaden. Mangekyō-Testtechnik.",category:"dojutsu",clanRestriction:["clan-uchiha"],acquisitionMethod:"PROGRESSION",baseCost:45,damage:35,effect:"damage",copyable:false,trainable:true,requiredDojutsuStage:4,requiredStateId:"sharingan",hidden:true}
+];
+export const techniqueById=(id:string)=>NINJA_TECHNIQUES.find(t=>t.id===id);

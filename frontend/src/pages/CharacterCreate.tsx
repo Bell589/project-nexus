@@ -1,0 +1,12 @@
+import { useEffect, useMemo, useState } from "react";
+import { api } from "../api/client";
+import type { Account, Character, ClanDefinition, RaceDefinition, World } from "../types/models";
+
+export function CharacterCreate({account,world,onBack,onCreated}:{account:Account;world:World;onBack:()=>void;onCreated:(c:Character)=>void}) {
+ const [races,setRaces]=useState<RaceDefinition[]>([]),[clans,setClans]=useState<ClanDefinition[]>([]);
+ const [raceId,setRaceId]=useState(""),[clanId,setClanId]=useState(""),[name,setName]=useState(""),[error,setError]=useState<string|null>(null),[loading,setLoading]=useState(false);
+ useEffect(()=>{Promise.all([api.getRaces(world.id),api.getClansForWorld(world.id)]).then(([r,c])=>{setRaces(r);setClans(c.filter(x=>x.accessMode==="character_creation"));if(r.length===1)setRaceId(r[0].id)}).catch(e=>setError(e.message))},[world.id]);
+ const compatible=useMemo(()=>clans.filter(c=>(!c.allowedRaceIds||!c.allowedRaceIds.length||c.allowedRaceIds.includes(raceId))),[clans,raceId]);
+ async function submit(e:React.FormEvent){e.preventDefault();setLoading(true);setError(null);try{if(!raceId)throw new Error("Bitte eine Rasse wählen");const c=await api.createCharacter({ownerId:account.id,ownerName:account.displayName,characterName:name,worldId:world.id,raceId,clanId:clanId||null});onCreated(c)}catch(e){setError(e instanceof Error?e.message:"Unbekannter Fehler")}finally{setLoading(false)}}
+ return <main className="setup-shell"><div className="setup-card"><button className="link-button" onClick={onBack}>← Welt wechseln</button><p className="eyebrow">CHARAKTERERSTELLUNG · {world.name}</p><h1>Dein Ursprung beginnt hier</h1><p className="muted">Fraktion und Organisation sind getrennt. In der Ozeanwelt startest du neutral und entscheidest dich nach deiner Origin.</p><form onSubmit={submit} className="form-grid"><label>Name<input value={name} onChange={e=>setName(e.target.value)} required minLength={2}/></label><label>Rasse<select value={raceId} onChange={e=>{setRaceId(e.target.value);setClanId("")}} required><option value="">Rasse wählen</option>{races.map(r=><option key={r.id} value={r.id}>{r.name}</option>)}</select></label><label>Clan / Blutlinie<select value={clanId} onChange={e=>setClanId(e.target.value)}><option value="">Kein Clan</option>{compatible.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>{error&&<p className="error-text">{error}</p>}<button className="primary-button" disabled={loading}>{loading?"Erstelle...":"Charakter erstellen"}</button></form></div></main>
+}

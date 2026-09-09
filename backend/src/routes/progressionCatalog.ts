@@ -1,0 +1,12 @@
+import { Router } from "express";
+import { RACES } from "../data/races.js";
+import { CLANS } from "../data/clans.js";
+import { ORGANIZATION_DEFINITIONS } from "../data/organizations.js";
+import { MASTER_TRAINERS } from "../data/trainers.js";
+import { DISCOVERIES } from "../data/discoveries.js";
+export const progressionCatalogRouter = Router();
+progressionCatalogRouter.get("/races", (req,res) => res.json(req.query.worldId ? RACES.filter(r=>r.worldId===req.query.worldId) : RACES));
+progressionCatalogRouter.get("/clans", (req,res) => res.json(req.query.worldId ? CLANS.filter(c=>c.worldId===req.query.worldId) : CLANS));
+progressionCatalogRouter.get("/organizations", (req,res) => res.json(req.query.worldId ? ORGANIZATION_DEFINITIONS.filter(o=>o.worldId===req.query.worldId) : ORGANIZATION_DEFINITIONS));
+progressionCatalogRouter.get("/trainers", (req,res) => res.json(req.query.worldId ? MASTER_TRAINERS.filter(t=>t.worldId===req.query.worldId) : MASTER_TRAINERS));
+progressionCatalogRouter.get("/discoveries", (req,res) => res.json(req.query.worldId ? DISCOVERIES.filter(d=>d.worldId===req.query.worldId) : DISCOVERIES));
