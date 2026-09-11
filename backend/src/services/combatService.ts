@@ -88,6 +88,10 @@ export function startCombat(characterId: string, enemyId: string): CombatSession
     ritterSummoned: false,
     ritterHp: 0,
     ritterMaxHp: 0,
+    ritterEnergy: 0,
+    ritterEnergyMax: 0,
+    ritterDefeated: false,
+    ritterFusionMode: null,
     activeDojutsu: null,
     dodgePrepared: false,
     enemyAccuracyDebuffRounds: 0,
@@ -118,9 +122,8 @@ function unlockedAbilityPool(character: Character, ritterSummoned: boolean): Abi
   const activeKarma=character.karmaStates.find(k=>k.active); if(activeKarma) pool.push(...getUnlockedKarmaAbilities(activeKarma.progressPct));
   // Der Ritter ist ein beschwörbarer NPC - seine Fähigkeiten sind erst nach
   // Beschwörung nutzbar, nicht schon ab Kampfstart.
-  if (character.spektralritterPact && ritterSummoned) {
-    pool.push(...character.spektralritterPact.individualAbilities);
-  }
+  // Spektralritter-Fähigkeiten gehören dem beschworenen Ritter und niemals dem Magier.
+  // Sie werden ausschließlich über ritter_technik ausgeführt.
   return pool;
 }
 
@@ -192,6 +195,29 @@ export function performAction(
     character.currentHp=Math.round(session.characterHp); character.energy.current=Math.round(session.characterResource); CharacterStore.save(character); return CombatSessionStore.save(session);
   }
 
+  if(action==="ritter_teilfusion" || action==="ritter_vollfusion") {
+    if(!session.ritterSummoned || session.ritterHp<=0 || !character.spektralritterPact) throw new ValidationError("Beschwöre zuerst deinen Spektralritter.");
+    const requiredStage=action==="ritter_teilfusion"?3:4;
+    if(character.spektralritterPact.stageIndex<requiredStage) throw new ValidationError(action==="ritter_teilfusion"?"Teilverschmelzung ist im Pakt noch nicht gemeistert.":"Vollverschmelzung ist im Pakt noch nicht gemeistert.");
+    const cost=action==="ritter_teilfusion"?25:40;if(session.characterResource<cost)throw new ValidationError(`Nicht genug ${session.resourceLabel} für die Verschmelzung.`);
+    session.characterResource-=cost;session.ritterFusionMode=action==="ritter_teilfusion"?"partial":"full";session.ritterSummoned=false;session.round++;
+    session.log.push({round:session.round,characterAction:action,enemyAction:"verteidigung",damageToEnemy:0,damageToCharacter:0,abilityUsed:character.spektralritterPact.generatedName,note:session.ritterFusionMode==="partial"?"Teilverschmelzung: Magier und Ritter handeln nun als eine Einheit mit gemeinsamem Moveset.":"Vollverschmelzung: Die Rittermanifestation wird zur vollständigen Rüstung/Form des Magiers."});
+    character.energy.current=Math.round(session.characterResource);CharacterStore.save(character);return CombatSessionStore.save(session);
+  }
+
+  if(action==="ritter_technik") {
+    if(!session.ritterSummoned || session.ritterHp<=0 || !character.spektralritterPact) throw new ValidationError("Beschwöre zuerst deinen Spektralritter.");
+    const ability=character.spektralritterPact.individualAbilities.find(a=>a.name===abilityName);
+    if(!ability) throw new ValidationError("Diese Technik gehört nicht zu deinem Spektralritter.");
+    const cost=Math.max(5,abilityResourceCost(ability));
+    if(session.ritterEnergy<cost) throw new ValidationError(`Der Spektralritter hat nicht genug eigene Energie (${session.ritterEnergy}/${cost}).`);
+    session.ritterEnergy-=cost;
+    const damage=randomVariance(getKampfkraft(character)*(.32+(ability.kind==="angriff"?.12:.2)),false);
+    session.enemyHp=Math.max(0,session.enemyHp-damage);session.round++;
+    session.log.push({round:session.round,characterAction:action,enemyAction:"verteidigung",damageToEnemy:Math.round(damage),damageToCharacter:0,abilityUsed:ability.name,note:`${character.spektralritterPact.generatedName} setzt ${ability.name} als eigene Aktion ein. Ritterkosten: ${cost}.`});
+    if(session.enemyHp<=0)session.status="gewonnen";return CombatSessionStore.save(session);
+  }
+
   if(action==="ritter_angriff") {
     if(!session.ritterSummoned || session.ritterHp<=0 || !character.spektralritterPact) throw new ValidationError("Kein kampffähiger Spektralritter beschworen.");
     const damage=randomVariance(getKampfkraft(character)*.28,false);session.enemyHp=Math.max(0,session.enemyHp-damage);session.round++;
@@ -204,16 +230,15 @@ export function performAction(
     if (!character.spektralritterPact) {
       throw new ValidationError("Charakter hat keinen Spektralritter-Pakt - nichts zu beschwören");
     }
-    if (session.ritterSummoned) {
-      throw new ValidationError("Der Ritter ist bereits beschworen");
-    }
+    if (session.ritterSummoned) throw new ValidationError("Der Ritter ist bereits beschworen");
+    if (session.ritterDefeated) throw new ValidationError("Der Ritter wurde in diesem Kampf bereits besiegt und kann nicht erneut beschworen werden.");
     const cost = 20;
     if (session.characterResource < cost) {
       throw new ValidationError(`Nicht genug ${session.resourceLabel} zum Beschwören (${session.characterResource}/${cost}).`);
     }
     session.characterResource -= cost;
     session.ritterSummoned = true;
-    session.ritterMaxHp = Math.max(80, Math.round(getKampfkraft(character)*1.4)); session.ritterHp=session.ritterMaxHp;
+    session.ritterMaxHp = Math.max(80, Math.round(getKampfkraft(character)*1.4)); session.ritterHp=session.ritterMaxHp; session.ritterEnergyMax=Math.max(60,Math.round(character.energy.max*.75)); session.ritterEnergy=session.ritterEnergyMax;
     session.round += 1;
   session.log.push({
       round: session.round,
@@ -320,7 +345,8 @@ export function performAction(
     session.characterResource -= hakiCost;
   }
 
-  const characterPower = getKampfkraft(character);
+  const fusionMultiplier=session.ritterFusionMode==="full"?1.45:session.ritterFusionMode==="partial"?1.22:1;
+  const characterPower = getKampfkraft(character)*fusionMultiplier;
   const enemyPower = enemy.kampfkraft;
   const enemyAction = pickEnemyAction();
 
@@ -410,7 +436,7 @@ export function performAction(
   const enemyHitChance=Math.min(.92,Math.max(.4,.64+(enemyPower*.08-character.stats.geschwindigkeit*.35)/100));
   if(Math.random()>enemyHitChance){rawEnemyDamage=0;note+=(note?" ":"")+"Der gegnerische Angriff verfehlt.";}
   if (session.enemyAccuracyDebuffRounds>0) { rawEnemyDamage*=0.72; session.enemyAccuracyDebuffRounds--; }
-  if(session.ritterSummoned && session.ritterHp>0 && Math.random()<.28){session.ritterHp=Math.max(0,session.ritterHp-rawEnemyDamage);note+=(note?" ":"")+`Der Gegner trifft deinen Spektralritter (${Math.round(rawEnemyDamage)} Schaden).`;rawEnemyDamage=0;if(session.ritterHp<=0){session.ritterSummoned=false;note+=" Der Ritter ist für diesen Kampf besiegt.";}}
+  if(session.ritterSummoned && session.ritterHp>0 && Math.random()<.28){session.ritterHp=Math.max(0,session.ritterHp-rawEnemyDamage);note+=(note?" ":"")+`Der Gegner trifft deinen Spektralritter (${Math.round(rawEnemyDamage)} Schaden).`;rawEnemyDamage=0;if(session.ritterHp<=0){session.ritterSummoned=false;session.ritterDefeated=true;note+=" Der Ritter ist für diesen Kampf besiegt und kann nicht erneut beschworen werden.";}}
   if (action === "ausweichen" || session.dodgePrepared) {
     const perceptionBonus=(session.activeDojutsu?.id==="sharingan" ? 0.08*session.activeDojutsu.stageIndex : session.activeDojutsu?.id==="byakugan" ? 0.12 : 0) + (session.activePowerup?.name==="Augen des Horus"?.14:0);
     const dodgeChance=Math.min(.8,.18+character.stats.geschwindigkeit/(character.stats.geschwindigkeit+Math.max(1,enemyPower))*.35+perceptionBonus);

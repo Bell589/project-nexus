@@ -14,7 +14,7 @@ import { addItem, equipItem, unequipItem, useConsumable } from "../services/inve
 import { trainSkill } from "../services/skillService.js";
 import { selectDomainRule } from "../services/domainService.js";
 import { advancePactStage, formPact, searchForSpektralritter } from "../services/spektralritterService.js";
-import { listNinjaTraining, trainNinjaTechnique, clanTrainSharingan, awakenSharingan, advanceSharingan, clanTrainByakugan, awakenByakugan } from "../services/ninjaProgressionService.js";
+import { listNinjaTraining, trainNinjaTechnique, clanTrainSharingan, awakenSharingan, advanceSharingan, clanTrainByakugan, awakenByakugan, selectChakraNatures } from "../services/ninjaProgressionService.js";
 
 export const charactersRouter = Router();
 
@@ -274,6 +274,7 @@ charactersRouter.post("/:id/spektralritter/advance", (req, res) => {
 });
 
 
+charactersRouter.post("/:id/chakra-natures", (req,res)=>{try{const c=selectChakraNatures(req.params.id,req.body?.natures??[]);res.json({...c,kampfkraft:getKampfkraft(c)})}catch(err){if(err instanceof ValidationError)return res.status(400).json({error:err.message});throw err}});
 charactersRouter.get("/:id/ninja-training", (req,res)=>{try{res.json(listNinjaTraining(req.params.id))}catch(err){if(err instanceof ValidationError)return res.status(400).json({error:err.message});throw err}});
 charactersRouter.post("/:id/ninja-training/:techniqueId", (req,res)=>{try{const c=trainNinjaTechnique(req.params.id,req.params.techniqueId);res.json({...c,kampfkraft:getKampfkraft(c)})}catch(err){if(err instanceof ValidationError)return res.status(400).json({error:err.message});throw err}});
 charactersRouter.post("/:id/sharingan/clan-training", (req,res)=>{try{const c=clanTrainSharingan(req.params.id);res.json({...c,kampfkraft:getKampfkraft(c)})}catch(err){if(err instanceof ValidationError)return res.status(400).json({error:err.message});throw err}});

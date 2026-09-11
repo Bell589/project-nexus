@@ -11,7 +11,10 @@ export type CombatAction =
   | "item"
   | "powerup_deaktivieren"
   | "clan_power_aktivieren"
-  | "ritter_angriff";
+  | "ritter_angriff"
+  | "ritter_technik"
+  | "ritter_teilfusion"
+  | "ritter_vollfusion";
 export type CombatStatus = "laufend" | "gewonnen" | "verloren" | "geflohen";
 export type HakiMode = "verstaerkung" | "dominanz" | "wahrnehmung";
 
@@ -54,6 +57,10 @@ export interface CombatSession {
   ritterSummoned: boolean;
   ritterHp: number;
   ritterMaxHp: number;
+  ritterEnergy: number;
+  ritterEnergyMax: number;
+  ritterDefeated: boolean;
+  ritterFusionMode: "partial" | "full" | null;
   activeDojutsu: { id:string; name:string; stageIndex:number; upkeepCost:number } | null;
   dodgePrepared: boolean;
   enemyAccuracyDebuffRounds: number;

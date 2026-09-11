@@ -22,6 +22,8 @@ function doujutsuOrigin() {
 }
 
 export function searchForDoujutsu(characterId: string): UniquePowerInstance {
+  throw new ValidationError("Die alte zufällige Dōjutsu-Bindung ist deaktiviert. Dōjutsu entstehen ausschließlich über Clantraining und Progression (z. B. Sharingan/Byakugan). ");
+  /* legacy implementation intentionally unreachable */
   const character = requireShinobi(characterId);
   if (character.doujutsu) {
     throw new ValidationError("Charakter besitzt bereits ein Dōjutsu");
@@ -30,6 +32,8 @@ export function searchForDoujutsu(characterId: string): UniquePowerInstance {
 }
 
 export function acquireDoujutsu(characterId: string, instance: UniquePowerInstance): Character {
+  throw new ValidationError("Die alte zufällige Dōjutsu-Bindung ist deaktiviert. Dōjutsu entstehen ausschließlich über Clantraining und Progression (z. B. Sharingan/Byakugan). ");
+  /* legacy implementation intentionally unreachable */
   const character = requireShinobi(characterId);
   if (character.doujutsu) {
     throw new ValidationError("Charakter besitzt bereits ein Dōjutsu");
@@ -51,6 +55,8 @@ export function acquireDoujutsu(characterId: string, instance: UniquePowerInstan
 }
 
 export function advanceDoujutsu(characterId: string): Character {
+  throw new ValidationError("Die alte zufällige Dōjutsu-Bindung ist deaktiviert. Dōjutsu entstehen ausschließlich über Clantraining und Progression (z. B. Sharingan/Byakugan). ");
+  /* legacy implementation intentionally unreachable */
   const character = requireShinobi(characterId);
   if (!character.doujutsu) throw new ValidationError("Charakter besitzt noch kein Dōjutsu");
 

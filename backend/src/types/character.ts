@@ -62,6 +62,8 @@ export interface Character {
   doujutsu: UniquePowerInstance | null;
   dojutsuState: DojutsuState | null;
   ninjaTechniques: NinjaTechniqueState[];
+  /** Zwei bewusst gewählte Chakra-Naturen. Keine generische Power-Bindung. */
+  chakraNatures: string[];
   selfAssignedRank: string | null;
   crewId: string | null;
   inventory: InventorySlot[];

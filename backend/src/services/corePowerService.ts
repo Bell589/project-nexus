@@ -32,6 +32,7 @@ function originsFor(character: Character): UniquePowerOrigin[] {
 export function searchForUniquePower(characterId: string) {
   const character = CharacterStore.get(characterId);
   if (!character) throw new ValidationError(`Charakter "${characterId}" nicht gefunden`);
+  if(character.worldId==="ninja_welt") throw new ValidationError("Ninja besitzen keine generische Kernmacht-Bindung. Nutze Chakra-Naturen, Jutsu, Clan/Dōjutsu, Beschwörung, Bijū oder Karma.");
   if (character.uniquePower) {
     throw new ValidationError("Charakter besitzt bereits eine Unique Power");
   }
@@ -66,6 +67,7 @@ export function searchForUniquePower(characterId: string) {
 export function acquireUniquePower(characterId: string, instance: UniquePowerInstance): Character {
   const character = CharacterStore.get(characterId);
   if (!character) throw new ValidationError(`Charakter "${characterId}" nicht gefunden`);
+  if(character.worldId==="ninja_welt") throw new ValidationError("Generische Kernmacht-Bindung ist für Ninja deaktiviert.");
   if (character.uniquePower) {
     throw new ValidationError("Charakter besitzt bereits eine Unique Power");
   }

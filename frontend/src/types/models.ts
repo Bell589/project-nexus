@@ -78,6 +78,7 @@ export interface Character {
   doujutsu: UniquePowerInstance | null;
   dojutsuState: {definitionId:"sharingan"|"byakugan";name:string;awakened:boolean;stageIndex:number;mastery:number;activeOutsideCombat:boolean;personalAbilityIds:string[];developmentLog:string[]} | null;
   ninjaTechniques: {techniqueId:string;mastery:number;learned:boolean;analysisPct:number;seenCount:number;copied:boolean}[];
+  chakraNatures: string[];
   esperPact: { esperId: string; esperName: string; stageIndex: number; individualAbilities: Ability[]; developmentLog: string[] } | null;
   jinchuriki: { bijuuId: string; bijuuName: string; stageIndex: number; individualAbilities: Ability[]; developmentLog: string[] } | null;
   karmaStates: { otsutsukiId: string; progressPct: number; active: boolean; lineageId: string; unlockedAbilityIds: string[]; developmentLog: string[]; mastery?: number }[];
@@ -188,7 +189,7 @@ export interface Enemy {
   rewardComponents: Record<string, number>;
 }
 
-export type CombatAction = "angriff" | "verteidigung" | "spezialfaehigkeit" | "flucht" | "grundfertigkeit" | "ritter_beschwoeren" | "ausweichen" | "dojutsu_aktivieren" | "jutsu" | "item" | "powerup_deaktivieren" | "clan_power_aktivieren" | "ritter_angriff";
+export type CombatAction = "angriff" | "verteidigung" | "spezialfaehigkeit" | "flucht" | "grundfertigkeit" | "ritter_beschwoeren" | "ausweichen" | "dojutsu_aktivieren" | "jutsu" | "item" | "powerup_deaktivieren" | "clan_power_aktivieren" | "ritter_angriff" | "ritter_technik" | "ritter_teilfusion" | "ritter_vollfusion";
 export type CombatStatus = "laufend" | "gewonnen" | "verloren" | "geflohen";
 
 export interface CombatRoundLog {
@@ -216,7 +217,7 @@ export interface CombatSession {
   status: CombatStatus;
   log: CombatRoundLog[];
   activePowerup: ActivePowerup | null;
-  ritterSummoned?: boolean; ritterHp?: number; ritterMaxHp?: number;
+  ritterSummoned?: boolean; ritterHp?: number; ritterMaxHp?: number; ritterEnergy?: number; ritterEnergyMax?: number; ritterDefeated?: boolean; ritterFusionMode?: "partial"|"full"|null;
   activeDojutsu?: {id:string;name:string;stageIndex:number;upkeepCost:number}|null;
   dodgePrepared?: boolean; enemyAccuracyDebuffRounds?: number;
   createdAt: string;

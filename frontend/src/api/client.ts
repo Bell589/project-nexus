@@ -278,6 +278,7 @@ export const api = {
       body: JSON.stringify({ characterId }),
     }),
 
+  selectChakraNatures: (characterId:string,natures:string[]) => request<Character>(`/characters/${characterId}/chakra-natures`,{method:"POST",body:JSON.stringify({natures})}),
   getNinjaTraining: (characterId:string) => request<import("../types/models").NinjaTrainingEntry[]>(`/characters/${characterId}/ninja-training`),
   trainNinjaTechnique: (characterId:string,techniqueId:string) => request<Character>(`/characters/${characterId}/ninja-training/${techniqueId}`,{method:"POST"}),
   sharinganClanTraining: (characterId:string) => request<Character>(`/characters/${characterId}/sharingan/clan-training`,{method:"POST"}),

@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { api } from "../api/client";
-import { AbilityListItem } from "./AbilityListItem";
 import type { Character, UniquePowerInstance } from "../types/models";
 
-const STAGES = ["Pakt", "Resonanz", "Beschwörung", "Rittermanifestation", "Teilverschmelzung", "Vollständige Verschmelzung", "Unbegrenzte Weiterentwicklung"];
+const STAGES = ["Pakt", "Resonanz", "Beschwörungsbeherrschung", "Teilverschmelzung", "Vollständige Verschmelzung", "Erwachte Verschmelzung"];
 
 export function SpektralritterPanel({
   character,
@@ -104,11 +103,7 @@ export function SpektralritterPanel({
       <p>
         Stufe {pact.stageIndex + 1}/{STAGES.length}: <strong>{STAGES[pact.stageIndex]}</strong>
       </p>
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {pact.individualAbilities.map((a, i) => (
-          <AbilityListItem key={i} ability={a} />
-        ))}
-      </ul>
+      <div style={{background:"#f7f7f7",padding:10,borderRadius:6}}><strong>Rittertechniken</strong><p style={{fontSize:13}}>Diese Fähigkeiten gehören dem Ritter. Der Magier kann sie nicht selbst einsetzen. Beschwöre ihn im Kampf; danach erscheinen sie als eigene Ritteraktionen.</p><ul>{pact.individualAbilities.map((a,i)=><li key={i}><b>{a.name}</b> — {a.description}</li>)}</ul></div>
       {error && <p style={{ color: "crimson" }}>{error}</p>}
       <button onClick={advance} disabled={busy || isMaxStage}>
         {isMaxStage ? "Unbegrenzte Weiterentwicklung erreicht" : busy ? "..." : "Nächste Stufe"}

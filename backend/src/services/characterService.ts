@@ -100,6 +100,7 @@ export function createCharacter(input: CreateCharacterInput): Character {
     doujutsu: null,
     dojutsuState: null,
     ninjaTechniques: [],
+    chakraNatures: [],
     esperPact: null,
     jinchuriki: null,
     karmaStates: [],

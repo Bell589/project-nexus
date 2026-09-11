@@ -60,9 +60,9 @@ export function ProgressionPage({ character, onUpdated }: { character: Character
     <Panel title="Spezialentwicklungen">
       {character.dojutsuState && <div><strong>Dōjutsu:</strong> {character.dojutsuState.name} · {character.dojutsuState.awakened ? `Stufe ${character.dojutsuState.stageIndex}` : "Potenzial"} · Mastery {character.dojutsuState.mastery}%<p>Training und Entwicklung erfolgen im Fähigkeiten-Bereich.</p></div>}
       {character.esperPact && <div style={{marginTop:10}}><strong>Esper-Pakt:</strong> {character.esperPact.esperName} · Stufe {character.esperPact.stageIndex + 1}<div style={buttonRowStyle}><button onClick={()=>advanceSpecial("esper")}>Pakt vertiefen</button></div></div>}
-      {character.jinchuriki && <div style={{marginTop:10}}><strong>Jinchūriki:</strong> {character.jinchuriki.bijuuName} · Stufe {character.jinchuriki.stageIndex + 1}<div style={buttonRowStyle}><button onClick={()=>advanceSpecial("jinchuriki")}>Bindung trainieren</button><button onClick={baryon}>Extremen Spezialmodus versuchen</button></div></div>}
+      {character.jinchuriki && <div style={{marginTop:10}}><strong>Jinchūriki:</strong> {character.jinchuriki.bijuuName} · Stufe {character.jinchuriki.stageIndex + 1}<div style={buttonRowStyle}><button onClick={()=>advanceSpecial("jinchuriki")}>Jinchūriki-Kontrolle trainieren</button><button onClick={baryon}>Extremen Spezialmodus versuchen</button></div></div>}
       {character.karmaStates.filter(k=>k.active).map(k=><div key={k.otsutsukiId} style={{marginTop:10}}><strong>Karma:</strong> {k.otsutsukiId} · {k.progressPct}% · {k.unlockedAbilityIds.length} freigeschaltete Fähigkeiten<div style={buttonRowStyle}><button onClick={reincarnate}>Reinkarnation / Transformation versuchen</button></div></div>)}
-      {!character.doujutsu && !character.esperPact && !character.jinchuriki && character.karmaStates.filter(k=>k.active).length===0 && <p>Noch keine besondere Entwicklungsbindung aktiv.</p>}
+      {!character.doujutsu && !character.esperPact && !character.jinchuriki && character.karmaStates.filter(k=>k.active).length===0 && <p>Noch keine besondere Entwicklung aktiv.</p>}
     </Panel>
 
     <Panel title="Seltene Meister" muted>
