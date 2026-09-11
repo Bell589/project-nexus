@@ -42,6 +42,7 @@ export interface Character {
   stats: { kraft:number; verteidigung:number; lp:number; geschwindigkeit:number; genauigkeit:number; power:number };
   energy: { current:number; max:number; label:string };
   currentHp: number;
+  maxHp: number;
   skillPoints: number;
   statPoints: number;
   gold: number;
@@ -141,6 +142,7 @@ export interface ActivePowerup {
   roundsRemaining: number;
   damageBonusPct: number;
   incomingReductionPct: number;
+  upkeepCost?: number;
 }
 
 export type ItemSlot = "waffe" | "ruestung" | "accessoire";
@@ -174,6 +176,7 @@ export interface Mission {
   rewardComponents: Record<string, number>;
   rewardItemId?: string;
   rewardGold?: number;
+  requiredLocationId?: string; factionIds?: string[];
 }
 
 export interface Enemy {
@@ -185,7 +188,7 @@ export interface Enemy {
   rewardComponents: Record<string, number>;
 }
 
-export type CombatAction = "angriff" | "verteidigung" | "spezialfaehigkeit" | "flucht" | "grundfertigkeit" | "ritter_beschwoeren" | "ausweichen" | "dojutsu_aktivieren" | "jutsu";
+export type CombatAction = "angriff" | "verteidigung" | "spezialfaehigkeit" | "flucht" | "grundfertigkeit" | "ritter_beschwoeren" | "ausweichen" | "dojutsu_aktivieren" | "jutsu" | "item" | "powerup_deaktivieren" | "clan_power_aktivieren" | "ritter_angriff";
 export type CombatStatus = "laufend" | "gewonnen" | "verloren" | "geflohen";
 
 export interface CombatRoundLog {
@@ -213,7 +216,7 @@ export interface CombatSession {
   status: CombatStatus;
   log: CombatRoundLog[];
   activePowerup: ActivePowerup | null;
-  ritterSummoned?: boolean;
+  ritterSummoned?: boolean; ritterHp?: number; ritterMaxHp?: number;
   activeDojutsu?: {id:string;name:string;stageIndex:number;upkeepCost:number}|null;
   dodgePrepared?: boolean; enemyAccuracyDebuffRounds?: number;
   createdAt: string;

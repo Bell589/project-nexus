@@ -14,7 +14,7 @@ import { addItem, equipItem, unequipItem, useConsumable } from "../services/inve
 import { trainSkill } from "../services/skillService.js";
 import { selectDomainRule } from "../services/domainService.js";
 import { advancePactStage, formPact, searchForSpektralritter } from "../services/spektralritterService.js";
-import { listNinjaTraining, trainNinjaTechnique, clanTrainSharingan, awakenSharingan, advanceSharingan } from "../services/ninjaProgressionService.js";
+import { listNinjaTraining, trainNinjaTechnique, clanTrainSharingan, awakenSharingan, advanceSharingan, clanTrainByakugan, awakenByakugan } from "../services/ninjaProgressionService.js";
 
 export const charactersRouter = Router();
 
@@ -278,4 +278,7 @@ charactersRouter.get("/:id/ninja-training", (req,res)=>{try{res.json(listNinjaTr
 charactersRouter.post("/:id/ninja-training/:techniqueId", (req,res)=>{try{const c=trainNinjaTechnique(req.params.id,req.params.techniqueId);res.json({...c,kampfkraft:getKampfkraft(c)})}catch(err){if(err instanceof ValidationError)return res.status(400).json({error:err.message});throw err}});
 charactersRouter.post("/:id/sharingan/clan-training", (req,res)=>{try{const c=clanTrainSharingan(req.params.id);res.json({...c,kampfkraft:getKampfkraft(c)})}catch(err){if(err instanceof ValidationError)return res.status(400).json({error:err.message});throw err}});
 charactersRouter.post("/:id/sharingan/awaken", (req,res)=>{try{const c=awakenSharingan(req.params.id);res.json({...c,kampfkraft:getKampfkraft(c)})}catch(err){if(err instanceof ValidationError)return res.status(400).json({error:err.message});throw err}});
+charactersRouter.post("/:id/byakugan/clan-training", (req,res)=>{try{const c=clanTrainByakugan(req.params.id);res.json({...c,kampfkraft:getKampfkraft(c)})}catch(err){if(err instanceof ValidationError)return res.status(400).json({error:err.message});throw err}});
+charactersRouter.post("/:id/byakugan/awaken", (req,res)=>{try{const c=awakenByakugan(req.params.id);res.json({...c,kampfkraft:getKampfkraft(c)})}catch(err){if(err instanceof ValidationError)return res.status(400).json({error:err.message});throw err}});
+
 charactersRouter.post("/:id/sharingan/advance", (req,res)=>{try{const c=advanceSharingan(req.params.id);res.json({...c,kampfkraft:getKampfkraft(c)})}catch(err){if(err instanceof ValidationError)return res.status(400).json({error:err.message});throw err}});

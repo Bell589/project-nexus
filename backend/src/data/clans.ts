@@ -48,7 +48,7 @@ export const CLANS: ClanDefinition[] = [
     ["osiris", "Osiris", "divine_magic", "Lebens-/Unterweltmagie", "Arbeitsrichtung Leben, Tod, Wiederherstellung und Unterwelt."],
     ["thot", "Thot", "divine_magic", "Schriftmagie", "Arbeitsrichtung Wissen, magische Schrift, Runen und Analyse."],
   ].map(([key, name, category, magicName, desc]) => ({
-    id: `mage-${key}-lineage`, worldId: "avalon" as const, name: `${name}-Clan`, description: `Arbeitsname für eine göttliche Magier-Blutlinie. Nicht final.`, accessMode: "disabled" as const, allowedRaceIds: ["mage-divine-descendant"], allowedFactionIds: ["magier"], placeholder: true,
+    id: `mage-${key}-lineage`, worldId: "avalon" as const, name: `${name}-Clan`, description: `Arbeitsname für eine göttliche Magier-Blutlinie. Nicht final.`, accessMode: (key === "horus" || key === "ra" ? "character_creation" : "disabled") as "character_creation" | "disabled", allowedRaceIds: ["mage-divine-descendant"], allowedFactionIds: ["magier"], placeholder: true,
     abilityPaths: [
       path(`mage-${key}-eye`, name === "Horus" ? "Augen des Horus" : `Göttliche Augenlinie: ${name}`, "divine_eye", name === "Horus" ? desc : "Göttliche Augenfähigkeit; konkrete Effekte werden später finalisiert.", ["Potenzial", "Grundform", "Verbesserte Form", "Hohe Form", "Offene Endstufe"], true),
       path(`mage-${key}-magic`, magicName, "divine_magic", desc, ["Potenzial", "Grundtechnik", "Vertiefung", "Meisterschaft", "Offene Endstufe"], true),

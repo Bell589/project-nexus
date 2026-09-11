@@ -160,10 +160,10 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ characterId }),
     }),
-  combatAction: (sessionId: string, action: CombatAction, abilityName?: string) =>
+  combatAction: (sessionId: string, action: CombatAction, abilityName?: string, hakiMode?: "verstaerkung"|"dominanz"|"wahrnehmung") =>
     request<CombatSession>(`/combat/session/${sessionId}/action`, {
       method: "POST",
-      body: JSON.stringify({ action, abilityName }),
+      body: JSON.stringify({ action, abilityName, hakiMode }),
     }),
 
   getArcaneControllers: () => request<Record<string, string>>("/arcane-network/controllers"),
@@ -282,6 +282,8 @@ export const api = {
   trainNinjaTechnique: (characterId:string,techniqueId:string) => request<Character>(`/characters/${characterId}/ninja-training/${techniqueId}`,{method:"POST"}),
   sharinganClanTraining: (characterId:string) => request<Character>(`/characters/${characterId}/sharingan/clan-training`,{method:"POST"}),
   awakenSharingan: (characterId:string) => request<Character>(`/characters/${characterId}/sharingan/awaken`,{method:"POST"}),
+  byakuganClanTraining: (characterId:string) => request<Character>(`/characters/${characterId}/byakugan/clan-training`,{method:"POST"}),
+  awakenByakugan: (characterId:string) => request<Character>(`/characters/${characterId}/byakugan/awaken`,{method:"POST"}),
   advanceSharingan: (characterId:string) => request<Character>(`/characters/${characterId}/sharingan/advance`,{method:"POST"}),
 
   // Dōjutsu

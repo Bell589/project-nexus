@@ -1,6 +1,13 @@
 import type { Mission } from "../types/mission.js";
 
 export const MISSIONS: Mission[] = [
+  {id:"ocean-handelsroute",worldId:"ozeanwelt",requiredLocationId:"insel-sturmklippe",title:"Gefährliche Handelsroute",description:"Reise zwischen den Inseln und sichere die Route vor Räubern.",minKampfkraft:15,rewardComponents:{erfahrung:18,training:5},rewardGold:180},
+  {id:"ocean-marine-patrouille",worldId:"ozeanwelt",requiredLocationId:"marine-hq",factionIds:["marine"],title:"Marine-Patrouille",description:"Unterstütze die Ordnungskräfte gegen Piratenaktivität.",minKampfkraft:20,rewardComponents:{erfahrung:20,erfolge:6},rewardGold:200},
+  {id:"soul-akademie-einsatz",worldId:"soul_society",requiredLocationId:"seelenbezirk-1",factionIds:["shinigami"],title:"Erster Außeneinsatz",description:"Stabilisiere einen Seelenbezirk und stelle dich einem korrumpierten Geist.",minKampfkraft:10,rewardComponents:{erfahrung:16,training:5},rewardGold:160},
+  {id:"soul-adjuchas-spur",worldId:"soul_society",requiredLocationId:"seelenbezirk-3",title:"Spur eines Adjuchas",description:"Folge einer starken Hollow-Signatur in den Grenzbezirk.",minKampfkraft:55,rewardComponents:{erfahrung:28,faehigkeiten:12},rewardGold:260},
+  {id:"avalon-ort-der-macht",worldId:"avalon",requiredLocationId:"obelisk-des-blitzes",title:"Resonanz am Ort der Macht",description:"Reise zu einem Ort der Macht und untersuche seine magische Signatur.",minKampfkraft:10,rewardComponents:{systemBeherrschung:12,training:5},rewardGold:180},
+  {id:"avalon-ritterspur",worldId:"avalon",requiredLocationId:"spektralwelt-schleier",title:"Spuren im Schleier",description:"Untersuche Hinweise auf einen Spektralritter nahe dem Schleier.",minKampfkraft:30,rewardComponents:{erfahrung:18,systemBeherrschung:10},rewardGold:220},
+  {id:"ninja-clantraining",worldId:"ninja_welt",requiredLocationId:"trainingsfeld-clans",title:"Clan-Trainingsauftrag",description:"Beweise deine Grundlagen auf den Clan-Trainingsfeldern.",minKampfkraft:20,rewardComponents:{training:10,faehigkeiten:6},rewardGold:160},
   {
     id: "ninja-erste-patrouille", worldId: "ninja_welt", title: "Erste Dorfpatrouille",
     description: "Sichere die Wege rund um dein Dorf und melde verdächtige Spuren.", minKampfkraft: 0,

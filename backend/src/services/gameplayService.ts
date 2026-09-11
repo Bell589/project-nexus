@@ -25,13 +25,13 @@ export function advanceOrigin(characterId:string):Character {
 }
 export function spendStatPoint(characterId:string, stat:keyof Character["stats"]):Character {
  const c=get(characterId); if(c.statPoints<1)throw new ValidationError("Keine freien Statpunkte"); if(!(stat in c.stats))throw new ValidationError("Ungültiger Stat");
- c.statPoints--; c.stats[stat]+=1; c.energy.max=energyMax(c); if(c.energy.current>c.energy.max)c.energy.current=c.energy.max; return CharacterStore.save(c);
+ c.statPoints--; c.stats[stat]+=1; c.energy.max=energyMax(c); if(c.energy.current>c.energy.max)c.energy.current=c.energy.max; c.maxHp=maxHp(c); if(c.currentHp>c.maxHp)c.currentHp=c.maxHp; return CharacterStore.save(c);
 }
 export function trainMastery(characterId:string, abilityId:string):Character {
  const c=get(characterId); const a=c.abilityProgress.find(x=>x.abilityId===abilityId); if(!a)throw new ValidationError("Fähigkeit ist nicht gelernt");
  const mastery=(a as any).mastery??0; (a as any).mastery=Math.min(100,mastery+5); a.developmentLog.push(`Beherrschung auf ${(a as any).mastery}% trainiert`); return CharacterStore.save(c);
 }
-export function rest(characterId:string):Character { const c=get(characterId); c.energy.current=c.energy.max; c.currentHp=c.stats.lp*10; return CharacterStore.save(c); }
+export function rest(characterId:string):Character { const c=get(characterId); c.maxHp=maxHp(c); c.energy.current=c.energy.max; c.currentHp=c.maxHp; return CharacterStore.save(c); }
 export function travel(characterId:string,toLocationId:string):TravelResult {
  const c=get(characterId); const loc=LOCATIONS.find(l=>l.id===toLocationId&&l.worldId===c.worldId); if(!loc)throw new ValidationError("Ort gehört nicht zur Welt");
  const from=c.currentLocationId; c.currentLocationId=loc.id; CharacterStore.save(c);
@@ -64,6 +64,7 @@ export function joinOrganization(characterId:string,organizationId:string):Playe
 }
 export function depositTreasury(characterId:string,organizationId:string,amount:number){const c=get(characterId),o=OrganizationStore.get(organizationId);if(!o)throw new ValidationError("Organisation fehlt");if(amount<1||c.gold<amount)throw new ValidationError("Ungültiger Betrag");if(!o.members.some(m=>m.characterId===c.id))throw new ValidationError("Kein Mitglied");c.gold-=amount;o.treasuryGold+=amount;CharacterStore.save(c);return o}
 export function energyMax(c:Character){return Math.max(100,c.stats.power*10)}
+export function maxHp(c:Character){return Math.max(100,c.stats.lp*10)}
 
 export function listShopItems(){return ITEMS.map((i:any)=>({price:i.price??100,tradeable:i.tradeable??true,marketplaceAllowed:i.marketplaceAllowed??true,bound:i.bound??false,unique:i.unique??false,organizationStorageAllowed:i.organizationStorageAllowed??true,rarity:i.rarity??"common",category:i.category??(i.slot==="waffe"?"weapon":i.slot==="verbrauchsgut"?"consumable":"equipment"),...i}))}
 export function buyShopItem(characterId:string,itemId:string,quantity:number):Character {const c=get(characterId);const item:any=listShopItems().find(i=>i.id===itemId);if(!item)throw new ValidationError("Item unbekannt");if(quantity<1)throw new ValidationError("Ungültige Menge");const cost=item.price*quantity;if(c.gold<cost)throw new ValidationError("Nicht genug Gold");c.gold-=cost;const slot=c.inventory.find(i=>i.itemId===itemId);if(slot)slot.quantity+=quantity;else c.inventory.push({itemId,quantity});return CharacterStore.save(c)}

@@ -50,6 +50,8 @@ export interface Character {
   stats: CharacterStats;
   energy: CharacterEnergy;
   currentHp: number;
+  /** Persistenter maximaler LP-Wert; Combat darf diesen Wert nicht neu hardcoden. */
+  maxHp: number;
   skillPoints: number;
   statPoints: number;
   gold: number;

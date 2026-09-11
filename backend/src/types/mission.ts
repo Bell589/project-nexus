@@ -10,4 +10,6 @@ export interface Mission {
   rewardComponents: Partial<KampfkraftComponents>;
   rewardItemId?: string;
   rewardGold?: number;
+  requiredLocationId?: string;
+  factionIds?: string[];
 }

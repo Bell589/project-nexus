@@ -11,13 +11,19 @@ export function trainSkill(characterId: string, skillName: string): Character {
 
   const faction = FACTIONS.find((f) => f.id === character.factionId);
   if (!faction) throw new ValidationError("Fraktion nicht gefunden");
-  if (!faction.baseSkills.includes(skillName)) {
+  const hakiSkills=["Wahrnehmung (Kenbunshoku)","Verstärkung (Busoshoku)","Dominanz (Haoshoku)"];
+  const isHaki=hakiSkills.includes(skillName);
+  if (isHaki) {
+    if(character.worldId!=="ozeanwelt" || character.origin.status!=="completed") throw new ValidationError("Haki-Training wird erst nach dem Insel-Ursprung verfügbar.");
+    if(!["insel-goldbucht","marine-hq"].includes(character.currentLocationId??"")) throw new ValidationError("Du musst einen bekannten Haki-Trainingsort aufsuchen (Goldbucht oder Marine-HQ).");
+    if(skillName==="Dominanz (Haoshoku)" && character.kampfkraftComponents.erfolge < 20) throw new ValidationError("Haoshoku ist selten: Du brauchst zuerst mindestens 20 Erfolge-Kampfkraft.");
+  } else if (!faction.baseSkills.includes(skillName)) {
     throw new ValidationError(
       `"${skillName}" ist keine Grundfähigkeit von ${faction.name}. Verfügbar: ${faction.baseSkills.join(", ")}`
     );
   }
 
-  const maxLevel = Math.floor(character.kampfkraftComponents.faehigkeiten / KAMPFKRAFT_PER_SKILL_LEVEL);
+  const maxLevel = Math.max(character.origin.status === "completed" ? 1 : 0, Math.floor(character.kampfkraftComponents.faehigkeiten / KAMPFKRAFT_PER_SKILL_LEVEL));
   const existing = character.skills.find((s) => s.name === skillName);
   const currentLevel = existing?.level ?? 0;
 

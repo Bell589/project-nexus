@@ -7,7 +7,11 @@ export type CombatAction =
   | "ritter_beschwoeren"
   | "ausweichen"
   | "dojutsu_aktivieren"
-  | "jutsu";
+  | "jutsu"
+  | "item"
+  | "powerup_deaktivieren"
+  | "clan_power_aktivieren"
+  | "ritter_angriff";
 export type CombatStatus = "laufend" | "gewonnen" | "verloren" | "geflohen";
 export type HakiMode = "verstaerkung" | "dominanz" | "wahrnehmung";
 
@@ -26,6 +30,7 @@ export interface ActivePowerup {
   roundsRemaining: number;
   damageBonusPct: number;
   incomingReductionPct: number;
+  upkeepCost?: number;
 }
 
 export interface CombatSession {
@@ -47,6 +52,8 @@ export interface CombatSession {
   activeDomainRuleId: string | null;
   /** Ob der Spektralritter beschworen wurde - erst danach nutzbar/steuerbar */
   ritterSummoned: boolean;
+  ritterHp: number;
+  ritterMaxHp: number;
   activeDojutsu: { id:string; name:string; stageIndex:number; upkeepCost:number } | null;
   dodgePrepared: boolean;
   enemyAccuracyDebuffRounds: number;

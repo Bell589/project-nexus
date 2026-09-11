@@ -46,8 +46,10 @@ export function MissionsPage({
                   .map(([k, v]) => `${k} +${v}`)
                   .join(", ")}
                 {m.rewardGold ? ` · Gold: ${m.rewardGold}` : " · Gold: 100"}{m.rewardItemId ? ` + Item: ${m.rewardItemId}` : ""}
+                {m.requiredLocationId ? ` · Missionsort: ${m.requiredLocationId}` : ""}
               </p>
-              <button disabled={done || busy === m.id} onClick={() => complete(m.id)}>
+              {m.requiredLocationId&&character.currentLocationId!==m.requiredLocationId&&<p style={{fontSize:12,color:"#8a5a00"}}>🔒 Reise zuerst zum Missionsort.</p>}
+              <button disabled={done || busy === m.id || (!!m.requiredLocationId&&character.currentLocationId!==m.requiredLocationId)} onClick={() => complete(m.id)}>
                 {done ? "Abgeschlossen" : busy === m.id ? "..." : "Abschließen"}
               </button>
             </div>

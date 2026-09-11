@@ -1,5 +1,6 @@
 import { FACTIONS } from "../data/factions.js";
 import { UNIQUE_POWER_ORIGINS } from "../data/uniquePowerOrigins.js";
+import { LOCATIONS } from "../data/locations.js";
 import { CharacterStore } from "../db/memoryStore.js";
 import { getKampfkraft } from "./characterService.js";
 import { stageThresholdFor } from "../types/corePowerThresholds.js";
@@ -34,6 +35,12 @@ export function searchForUniquePower(characterId: string) {
   if (character.uniquePower) {
     throw new ValidationError("Charakter besitzt bereits eine Unique Power");
   }
+
+  if(character.origin.status!=="completed") throw new ValidationError("Schließe zuerst deinen Welt-Ursprung ab, bevor du nach einer seltenen Kernmacht suchst.");
+  const loc=LOCATIONS.find(l=>l.id===character.currentLocationId);
+  if(character.worldId==="ozeanwelt" && !["insel-sturmklippe","insel-goldbucht"].includes(character.currentLocationId??"")) throw new ValidationError("Reliktspuren findest du aktuell nur auf erforschbaren Inseln.");
+  if(character.worldId==="avalon" && loc?.type!=="ort_der_macht") throw new ValidationError("Ancient/Unique Magic kann nur an einem Ort der Macht entdeckt werden. Reise zuerst dorthin.");
+  if(character.worldId==="soul_society" && character.factionId==="hollow" && character.completedMissionIds.length<1) throw new ValidationError("Resurrección-Potenzial entsteht erst nach mindestens einer abgeschlossenen Jagd/Mission.");
 
   const kampfkraft = getKampfkraft(character);
   const requiredMin = stageThresholdFor(0);

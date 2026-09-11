@@ -9,7 +9,7 @@ import type { Mission } from "../types/mission.js";
 export function listMissionsForCharacter(characterId: string): Mission[] {
   const character = CharacterStore.get(characterId);
   if (!character) throw new ValidationError(`Charakter "${characterId}" nicht gefunden`);
-  return MISSIONS.filter((m) => m.worldId === character.worldId);
+  return MISSIONS.filter((m) => m.worldId === character.worldId && (!m.factionIds || m.factionIds.includes(character.factionId)));
 }
 
 export function completeMission(characterId: string, missionId: string): Character {
@@ -24,6 +24,10 @@ export function completeMission(characterId: string, missionId: string): Charact
   if (character.completedMissionIds.includes(missionId)) {
     throw new ValidationError("Mission bereits abgeschlossen");
   }
+
+  if(character.origin.status!=="completed") throw new ValidationError("Schließe zuerst deinen Welt-Ursprung ab.");
+  if(mission.requiredLocationId && character.currentLocationId!==mission.requiredLocationId) throw new ValidationError("Du bist nicht am Missionsort. Reise zuerst zum angegebenen Ziel.");
+  if(mission.factionIds && !mission.factionIds.includes(character.factionId)) throw new ValidationError("Diese Mission gehört nicht zu deiner Fraktion.");
 
   const kampfkraft = getKampfkraft(character);
   if (kampfkraft < mission.minKampfkraft) {

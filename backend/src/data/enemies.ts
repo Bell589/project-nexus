@@ -1,6 +1,13 @@
 import type { Enemy } from "../types/enemy.js";
 
 export const ENEMIES: Enemy[] = [
+  { id:"ocean-marine-deserteur", worldId:"ozeanwelt", name:"Marine-Deserteur", description:"Bewaffneter Deserteur auf einer Handelsroute.", kampfkraft:28, rewardComponents:{erfahrung:14,training:4} },
+  { id:"ocean-kopfgeldjaeger", worldId:"ozeanwelt", name:"Kopfgeldjäger", description:"Jagt Piraten und lukrative Ziele gleichermaßen.", kampfkraft:42, rewardComponents:{erfahrung:20,erfolge:5} },
+  { id:"soul-akademie-geist", worldId:"soul_society", name:"Korrumpierter Geist", description:"Früher Gegner für Akademie-Absolventen.", kampfkraft:10, rewardComponents:{erfahrung:6} },
+  { id:"soul-adjuchas", worldId:"soul_society", name:"Adjuchas", description:"Fortgeschrittener Hollow mit hoher spiritueller Dichte.", kampfkraft:75, rewardComponents:{erfahrung:32,faehigkeiten:12} },
+  { id:"avalon-grabwaechter", worldId:"avalon", name:"Arkaner Grabwächter", description:"Magischer Wächter eines Ortes der Macht.", kampfkraft:32, rewardComponents:{erfahrung:16,systemBeherrschung:8} },
+  { id:"avalon-schattenmagier", worldId:"avalon", name:"Schattenmagier", description:"Rivalisierender Magier auf der Suche nach Ancient Magic.", kampfkraft:58, rewardComponents:{erfahrung:25,faehigkeiten:10} },
+  { id:"ninja-chuunin-pruefer", worldId:"ninja_welt", name:"Chūnin-Prüfer", description:"Trainingsgegner für fortgeschrittene Shinobi.", kampfkraft:55, rewardComponents:{erfahrung:22,training:8} },
   { id:"ninja-bandit", worldId:"ninja_welt", name:"Wegelagerer", description:"Ein früher Gegner für frisch ausgebildete Ninja.", kampfkraft:12, rewardComponents:{erfahrung:8} },
   { id:"ninja-rogue", worldId:"ninja_welt", name:"Abtrünniger Genin", description:"Ein gefährlicherer junger Abtrünniger.", kampfkraft:35, rewardComponents:{erfahrung:18,training:5} },
   { id:"hollow-streuner", worldId:"soul_society", name:"Streunender Hollow", description:"Eine frühe Bedrohung in den Seelenbezirken.", kampfkraft:14, rewardComponents:{erfahrung:9} },

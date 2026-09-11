@@ -63,7 +63,7 @@ export function useConsumable(characterId: string, itemId: string): Character {
     throw new ValidationError("Item nicht im Inventar");
   }
 
-  if (item.healHp) character.currentHp = Math.min(character.stats.lp * 10, character.currentHp + item.healHp);
+  if (item.healHp) character.currentHp = Math.min(character.maxHp ?? character.stats.lp * 10, character.currentHp + item.healHp);
   if (item.restoreEnergy) character.energy.current = Math.min(character.energy.max, character.energy.current + item.restoreEnergy);
   for (const [key, bonus] of Object.entries(item.statBonuses)) {
     const k = key as keyof Character["kampfkraftComponents"];

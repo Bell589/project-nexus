@@ -7,3 +7,16 @@ export function clanTrainSharingan(id:string){const c=get(id);if(c.clanId!=="cla
 export function awakenSharingan(id:string){const c=get(id);if(c.clanId!=="clan-uchiha"||!c.dojutsuState)throw new ValidationError("Zuerst Uchiha-Clantraining absolvieren.");if(c.dojutsuState.awakened)throw new ValidationError("Sharingan ist bereits erwacht.");if(c.kampfkraftComponents.training<4)throw new ValidationError("Du benötigst mehr praktische Trainingserfahrung, bevor das Sharingan erwachen kann.");c.dojutsuState.awakened=true;c.dojutsuState.stageIndex=1;c.dojutsuState.mastery=5;c.dojutsuState.developmentLog.push("Sharingan mit 1 Tomoe erwacht.");return CharacterStore.save(c)}
 export function advanceSharingan(id:string){const c=get(id),d=c.dojutsuState;if(!d?.awakened||d.definitionId!=="sharingan")throw new ValidationError("Sharingan ist noch nicht erwacht.");const req=[0,25,55,85][d.stageIndex]??100;if(d.mastery<req)throw new ValidationError(`Deine Sharingan-Beherrschung reicht noch nicht aus (${d.mastery}/${req}%).`);if(d.stageIndex>=4)throw new ValidationError("Mangekyō ist bereits erreicht; persönliche Weiterentwicklung folgt später.");d.stageIndex++;d.mastery=Math.max(5,d.mastery-15);d.developmentLog.push(d.stageIndex===2?"2 Tomoe entwickelt.":d.stageIndex===3?"3 Tomoe entwickelt.":"Mangekyō Sharingan entwickelt.");return CharacterStore.save(c)}
 export function recordTechniqueSeen(c:Character,techniqueId:string,sharinganStage:number){const t=techniqueById(techniqueId);if(!t)return;const s=state(c,techniqueId);s.seenCount++;const gain=Math.min(35,10+sharinganStage*6+(c.dojutsuState?.mastery??0)/10);s.analysisPct=Math.min(100,s.analysisPct+gain);if(s.analysisPct>=100&&t.copyable)s.copied=true;if(c.dojutsuState)c.dojutsuState.mastery=Math.min(100,c.dojutsuState.mastery+3)}
+
+export function clanTrainByakugan(id:string){
+ const c=get(id); if(c.clanId!=="clan-hyuga")throw new ValidationError("Nur Hyūga besitzen Byakugan-Potenzial.");
+ if(!c.dojutsuState)c.dojutsuState={definitionId:"byakugan",name:"Byakugan",awakened:false,stageIndex:0,mastery:0,activeOutsideCombat:false,personalAbilityIds:[],developmentLog:["Byakugan-Potenzial durch Clantraining erschlossen."]};
+ else c.dojutsuState.mastery=Math.min(100,c.dojutsuState.mastery+12);
+ return CharacterStore.save(c)
+}
+export function awakenByakugan(id:string){
+ const c=get(id); if(c.clanId!=="clan-hyuga"||c.dojutsuState?.definitionId!=="byakugan")throw new ValidationError("Zuerst Hyūga-Clantraining absolvieren.");
+ if(c.dojutsuState.awakened)throw new ValidationError("Byakugan ist bereits erwacht.");
+ if(c.dojutsuState.mastery<10)throw new ValidationError("Trainiere dein Byakugan-Potenzial weiter.");
+ c.dojutsuState.awakened=true;c.dojutsuState.stageIndex=1;c.dojutsuState.mastery=10;c.dojutsuState.developmentLog.push("Byakugan erwacht: Chakra-Sicht und Tenketsu-Wahrnehmung verfügbar.");return CharacterStore.save(c)
+}

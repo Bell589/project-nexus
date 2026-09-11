@@ -82,3 +82,13 @@ Siehe `V1_STATUS_2026-09-07.md`. Ergänzt wurden Stats/Energie/Gold/Origin, Trav
 - neutraler Ozean-Start mit Fraktionsentscheidung nach Origin
 - TypeScript Backend/Frontend erfolgreich geprüft
 - Backend-Smoke-Test erfolgreich
+
+## Gameplay-Meilenstein 2026-09-11
+- P0 Combat-LP/Energie: Character ist Source of Truth (`maxHp`, `currentHp`, `energy.max/current`).
+- Combat: Hit→Crit, Block, Dodge, Items, Power-Up-Deaktivierung/Unterhalt, Haki, Ritter-LP/Ritterzug.
+- Ninja: Byakugan + Hyūga-Techniken, Senju-Techniken, Karma im Combat-Pool.
+- Ocean: ortsgebundenes Haki-Meistertraining, Willenskraftkosten, ortsgebundene Relikt-Suche.
+- Soul: sichtbarer Shikai/Bankai/Sphäre-Pfad, Resurrección-Suche stärker an Gameplay gebunden.
+- Avalon: Horus/Ra Alpha-spielbar, göttliche Augen als Combat-State, Ancient Magic nur an Orten der Macht, Ritter als eigener Kampfteilnehmer.
+- Missionen/Content für alle vier Welten erweitert und teilweise an Orte/Fraktionen gebunden.
+- Neue Backend-Meilenstein-Tests; vollständige npm-Test-/Build-Ausführung wegen Sandbox-Dependency-Timeout nicht bestätigt.

@@ -79,6 +79,7 @@ export function createCharacter(input: CreateCharacterInput): Character {
     },
     stats: { kraft: 10, verteidigung: 10, lp: 10, geschwindigkeit: 10, genauigkeit: 10, power: 10 },
     currentHp: 100,
+    maxHp: 100,
     energy: { current: 100, max: 100, label: input.worldId === "ninja_welt" ? "Chakra" : input.worldId === "avalon" ? "Äther" : input.worldId === "soul_society" ? "Fluchenergie" : "Willenskraft" },
     skillPoints: 0,
     statPoints: 0,

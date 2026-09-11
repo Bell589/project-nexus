@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import { ENEMIES } from "../data/enemies.js";
+import { ITEMS } from "../data/items.js";
 import { DOMAIN_RULES } from "../data/domainRules.js";
 import { CharacterStore } from "../db/memoryStore.js";
 import { CombatSessionStore } from "../db/combatSessionStore.js";
@@ -12,6 +13,7 @@ import type { CombatAction, CombatSession, HakiMode } from "../types/combatSessi
 import type { WorldId } from "../types/world.js";
 import { techniqueById } from "../data/ninjaTechniques.js";
 import { recordTechniqueSeen } from "./ninjaProgressionService.js";
+import { getUnlockedKarmaAbilities } from "../data/karmaAbilities.js";
 
 export function listEnemiesForCharacter(characterId: string): Enemy[] {
   const character = CharacterStore.get(characterId);
@@ -60,15 +62,17 @@ export function startCombat(characterId: string, enemyId: string): CombatSession
   }
 
   const kampfkraft = getKampfkraft(character);
-  const characterMaxHp = Math.max(character.stats.lp * 10, Math.round(kampfkraft * HP_PER_KAMPFKRAFT) + 30);
+  // P0: Charakter-LP sind persistent. Combat übernimmt exakt currentHp/maxHp statt eigene LP zu erfinden.
+  const characterMaxHp = character.maxHp ?? Math.max(100, character.stats.lp * 10);
   const enemyMaxHp = Math.round(enemy.kampfkraft * HP_PER_KAMPFKRAFT) + 30;
-  const characterResourceMax = Math.round(kampfkraft * RESOURCE_PER_KAMPFKRAFT) + RESOURCE_BASE;
+  // Dasselbe gilt für die weltabhängige Energie: Character ist die Source of Truth.
+  const characterResourceMax = character.energy.max;
 
   const session: CombatSession = {
     id: nanoid(),
     characterId,
     enemyId,
-    characterHp: Math.min(characterMaxHp, Math.max(1, character.currentHp)),
+    characterHp: Math.min(characterMaxHp, Math.max(0, character.currentHp)),
     characterMaxHp,
     enemyHp: enemyMaxHp,
     enemyMaxHp,
@@ -82,6 +86,8 @@ export function startCombat(characterId: string, enemyId: string): CombatSession
     // Domäne gilt für den ganzen Kampf, falls der Charakter (Soul Society) eine gewählt hat
     activeDomainRuleId: character.activeDomainRuleId,
     ritterSummoned: false,
+    ritterHp: 0,
+    ritterMaxHp: 0,
     activeDojutsu: null,
     dodgePrepared: false,
     enemyAccuracyDebuffRounds: 0,
@@ -109,6 +115,7 @@ function unlockedAbilityPool(character: Character, ritterSummoned: boolean): Abi
   if (character.esperPact) pool.push(...character.esperPact.individualAbilities);
   if (character.jinchuriki) pool.push(...character.jinchuriki.individualAbilities);
   if (character.doujutsu) pool.push(...character.doujutsu.individualAbilities);
+  const activeKarma=character.karmaStates.find(k=>k.active); if(activeKarma) pool.push(...getUnlockedKarmaAbilities(activeKarma.progressPct));
   // Der Ritter ist ein beschwörbarer NPC - seine Fähigkeiten sind erst nach
   // Beschwörung nutzbar, nicht schon ab Kampfstart.
   if (character.spektralritterPact && ritterSummoned) {
@@ -156,6 +163,42 @@ export function performAction(
   const fleeingBlocked = domainRule?.id === "teleportation-verboten" || domainRule?.id === "fliegen-unmoeglich";
   const guaranteedHits = domainRule?.id === "schwerthiebe-garantiert";
 
+  if(action === "clan_power_aktivieren") {
+    if(character.worldId!=="avalon" || !["mage-horus-lineage","mage-ra-lineage"].includes(character.clanId??"")) throw new ValidationError("Keine spielbare göttliche Clanaktivierung verfügbar.");
+    const key=character.clanId==="mage-horus-lineage"?"mage-horus-eye":"mage-ra-magic"; const prog=character.abilityProgress.find(a=>a.abilityId===key);
+    if(!prog || prog.stageIndex<1) throw new ValidationError("Trainiere diese Clankraft zuerst mindestens bis zur Grundform.");
+    const cost=15;if(session.characterResource<cost)throw new ValidationError(`Nicht genug ${session.resourceLabel} (${cost} benötigt).`);session.characterResource-=cost;
+    const horus=character.clanId==="mage-horus-lineage";session.activePowerup={name:horus?"Augen des Horus":"Auge des Ra",roundsRemaining:5,damageBonusPct:horus ? .12 : .32,incomingReductionPct:horus ? .22 : .08,upkeepCost:horus?5:7};
+    session.round++;session.log.push({round:session.round,characterAction:action,enemyAction:"verteidigung",damageToEnemy:0,damageToCharacter:0,abilityUsed:session.activePowerup.name,note:horus?"Magische Strukturen, Bewegungen und Schwachpunkte werden sichtbar.":"Sonnenenergie verstärkt deine offensive Magie."});character.energy.current=Math.round(session.characterResource);CharacterStore.save(character);return CombatSessionStore.save(session);
+  }
+
+  if (action === "powerup_deaktivieren") {
+    if (!session.activePowerup && !session.activeDojutsu) throw new ValidationError("Kein aktiver Zustand zum Deaktivieren.");
+    const names=[session.activePowerup?.name,session.activeDojutsu?.name].filter(Boolean).join(" / ");
+    session.activePowerup=null; session.activeDojutsu=null; session.round+=1;
+    session.log.push({round:session.round,characterAction:action,enemyAction:"verteidigung",damageToEnemy:0,damageToCharacter:0,abilityUsed:names||null,note:`${names} deaktiviert.`});
+    character.energy.current=Math.max(0,Math.min(character.energy.max,Math.round(session.characterResource))); CharacterStore.save(character);
+    return CombatSessionStore.save(session);
+  }
+
+  if (action === "item") {
+    const item=ITEMS.find(i=>i.id===abilityName && i.slot==="verbrauchsgut") as any;
+    if(!item) throw new ValidationError("Verbrauchsitem unbekannt.");
+    const slot=character.inventory.find(i=>i.itemId===item.id); if(!slot?.quantity) throw new ValidationError("Dieses Item befindet sich nicht im Inventar.");
+    if(item.healHp) session.characterHp=Math.min(session.characterMaxHp,session.characterHp+item.healHp);
+    if(item.restoreEnergy) session.characterResource=Math.min(session.characterResourceMax,session.characterResource+item.restoreEnergy);
+    slot.quantity--; if(slot.quantity<=0) character.inventory=character.inventory.filter(i=>i!==slot);
+    session.round+=1; session.log.push({round:session.round,characterAction:action,enemyAction:"verteidigung",damageToEnemy:0,damageToCharacter:0,abilityUsed:item.name,note:`${item.name} eingesetzt.`});
+    character.currentHp=Math.round(session.characterHp); character.energy.current=Math.round(session.characterResource); CharacterStore.save(character); return CombatSessionStore.save(session);
+  }
+
+  if(action==="ritter_angriff") {
+    if(!session.ritterSummoned || session.ritterHp<=0 || !character.spektralritterPact) throw new ValidationError("Kein kampffähiger Spektralritter beschworen.");
+    const damage=randomVariance(getKampfkraft(character)*.28,false);session.enemyHp=Math.max(0,session.enemyHp-damage);session.round++;
+    session.log.push({round:session.round,characterAction:action,enemyAction:"verteidigung",damageToEnemy:Math.round(damage),damageToCharacter:0,abilityUsed:character.spektralritterPact.generatedName,note:"Dein Spektralritter handelt in seinem eigenen Zug."});
+    if(session.enemyHp<=0)session.status="gewonnen";return CombatSessionStore.save(session);
+  }
+
   // -- Ritter beschwören: eigene Aktion, kein Schaden, macht ihn danach steuerbar --
   if (action === "ritter_beschwoeren") {
     if (!character.spektralritterPact) {
@@ -170,6 +213,7 @@ export function performAction(
     }
     session.characterResource -= cost;
     session.ritterSummoned = true;
+    session.ritterMaxHp = Math.max(80, Math.round(getKampfkraft(character)*1.4)); session.ritterHp=session.ritterMaxHp;
     session.round += 1;
   session.log.push({
       round: session.round,
@@ -181,6 +225,11 @@ export function performAction(
       note: `${character.spektralritterPact.generatedName} wurde beschworen und ist ab jetzt steuerbar.`,
     });
     return CombatSessionStore.save(session);
+  }
+
+  if (session.activePowerup?.upkeepCost) {
+    if(session.characterResource < session.activePowerup.upkeepCost){ session.log.push({round:session.round,characterAction:action,enemyAction:"verteidigung",damageToEnemy:0,damageToCharacter:0,abilityUsed:session.activePowerup.name,note:`${session.activePowerup.name} bricht wegen fehlender ${session.resourceLabel} zusammen.`}); session.activePowerup=null; }
+    else session.characterResource -= session.activePowerup.upkeepCost;
   }
 
   if (session.activeDojutsu) {
@@ -266,6 +315,9 @@ export function performAction(
     if (level < 1) {
       throw new ValidationError(`${HAKI_SKILL_BY_MODE[hakiMode]} ist nicht trainiert - erst über Fähigkeiten-Training lernen.`);
     }
+    const hakiCost = hakiMode === "dominanz" ? 18 : 10;
+    if (session.characterResource < hakiCost) throw new ValidationError(`Nicht genug Willenskraft für Haki (${hakiCost} benötigt).`);
+    session.characterResource -= hakiCost;
   }
 
   const characterPower = getKampfkraft(character);
@@ -285,7 +337,8 @@ export function performAction(
     const st=character.ninjaTechniques.find(x=>x.techniqueId===usedJutsu!.id)!; st.mastery=Math.min(100,st.mastery+2);
     if(usedJutsu.effect==="genjutsu"){session.enemyAccuracyDebuffRounds=2;note=`${usedJutsu.name} verzerrt die Wahrnehmung des Gegners.`;}
     else if(usedJutsu.effect==="dodge"){session.dodgePrepared=true;note=`${usedJutsu.name} bereitet ein Ausweichmanöver vor.`;}
-    else {damageToEnemy=randomVariance(characterPower*((usedJutsu.damage??25)/100)*(1+(st.mastery/300)),guaranteedHits);note=`${character.characterName} setzt ${usedJutsu.name} ein.`;}
+    else if(usedJutsu.effect==="defense"){session.dodgePrepared=true; session.characterHp=Math.min(session.characterMaxHp,session.characterHp+(usedJutsu.id==="senju-regeneration"?20:0)); note=`${usedJutsu.name} stabilisiert deine Verteidigung${usedJutsu.id==="senju-regeneration"?" und Vitalität":""}.`;}
+    else {const eyePrecision=session.activeDojutsu?.id==="byakugan"?1.2:1;damageToEnemy=randomVariance(characterPower*((usedJutsu.damage??25)/100)*(1+(st.mastery/300))*eyePrecision,guaranteedHits);note=`${character.characterName} setzt ${usedJutsu.name} ein.`;}
   } else if (action === "angriff") {
     const activeDamageBonus = (session.activePowerup ? session.activePowerup.damageBonusPct : 0) + hakiDamageBonus;
     damageToEnemy = randomVariance(characterPower * 0.22 * (1 + activeDamageBonus), guaranteedHits);
@@ -301,6 +354,7 @@ export function performAction(
         roundsRemaining: usedAbility.powerup.rounds,
         damageBonusPct: usedAbility.powerup.damageBonusPct,
         incomingReductionPct: usedAbility.powerup.incomingReductionPct,
+        upkeepCost: Math.max(2, Math.round(abilityResourceCost(usedAbility) * 0.2)),
       };
       if (usedAbility.powerup.hpBonusFlat && !healingDisabled) {
         session.characterHp = Math.min(session.characterMaxHp, session.characterHp + usedAbility.powerup.hpBonusFlat);
@@ -314,8 +368,7 @@ export function performAction(
       note = `"${usedAbility.name}" eingesetzt - ${usedAbility.description}`;
     }
   } else if (action === "verteidigung") {
-    const activeDamageBonus = session.activePowerup ? session.activePowerup.damageBonusPct : 0;
-    damageToEnemy = randomVariance(characterPower * 0.05 * (1 + activeDamageBonus), false);
+    damageToEnemy = 0;
     if (hakiMode === "wahrnehmung") note = `Wahrnehmungs-Haki aktiv - erhöhte Ausweichchance. `;
   } else if (action === "flucht") {
     const fleeChance = Math.min(0.9, Math.max(0.1, characterPower / (characterPower + enemyPower)));
@@ -339,6 +392,14 @@ export function performAction(
     note = "Flucht fehlgeschlagen! ";
   }
 
+  // Trefferprüfung kommt vor Krit: Genauigkeit und Wahrnehmung sind echte Kampfwerte.
+  if(damageToEnemy>0 && !guaranteedHits){
+    const perception=session.activeDojutsu?8+session.activeDojutsu.stageIndex*3:(session.activePowerup?.name==="Augen des Horus"?12:0);
+    const hitChance=Math.min(.95,Math.max(.35,.62+(character.stats.genauigkeit+perception-enemyPower*.08)/100));
+    if(Math.random()>hitChance){damageToEnemy=0;note+=(note?" ":"")+"Der Angriff verfehlt.";}
+    else {const critChance=Math.min(.35,.05+character.stats.genauigkeit/250);if(Math.random()<critChance){damageToEnemy*=1.5;note+=(note?" ":"")+"Kritischer Treffer!";}}
+  }
+
   let rawEnemyDamage =
     enemyAction === "angriff"
       ? randomVariance(enemyPower * 0.22, false)
@@ -346,13 +407,16 @@ export function performAction(
         ? randomVariance(enemyPower * 0.4, false)
         : randomVariance(enemyPower * 0.05, false);
 
+  const enemyHitChance=Math.min(.92,Math.max(.4,.64+(enemyPower*.08-character.stats.geschwindigkeit*.35)/100));
+  if(Math.random()>enemyHitChance){rawEnemyDamage=0;note+=(note?" ":"")+"Der gegnerische Angriff verfehlt.";}
   if (session.enemyAccuracyDebuffRounds>0) { rawEnemyDamage*=0.72; session.enemyAccuracyDebuffRounds--; }
+  if(session.ritterSummoned && session.ritterHp>0 && Math.random()<.28){session.ritterHp=Math.max(0,session.ritterHp-rawEnemyDamage);note+=(note?" ":"")+`Der Gegner trifft deinen Spektralritter (${Math.round(rawEnemyDamage)} Schaden).`;rawEnemyDamage=0;if(session.ritterHp<=0){session.ritterSummoned=false;note+=" Der Ritter ist für diesen Kampf besiegt.";}}
   if (action === "ausweichen" || session.dodgePrepared) {
-    const perceptionBonus=session.activeDojutsu?.id==="sharingan" ? 0.08*session.activeDojutsu.stageIndex : 0;
+    const perceptionBonus=(session.activeDojutsu?.id==="sharingan" ? 0.08*session.activeDojutsu.stageIndex : session.activeDojutsu?.id==="byakugan" ? 0.12 : 0) + (session.activePowerup?.name==="Augen des Horus"?.14:0);
     const dodgeChance=Math.min(.8,.18+character.stats.geschwindigkeit/(character.stats.geschwindigkeit+Math.max(1,enemyPower))*.35+perceptionBonus);
     if(Math.random()<dodgeChance){rawEnemyDamage=0;note+=(note?" ":"")+"Du liest den Angriff und weichst erfolgreich aus.";} else note+=(note?" ":"")+"Das Ausweichmanöver reicht nicht vollständig."; session.dodgePrepared=false;
   }
-  if (action === "verteidigung") { rawEnemyDamage *= 0.4; }
+  if (action === "verteidigung") { rawEnemyDamage *= enemyAction === "spezialfaehigkeit" ? 0.65 : 0.4; }
   if (action === "flucht") {
     rawEnemyDamage *= 1.5;
   }
